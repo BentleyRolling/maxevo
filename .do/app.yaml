@@ -10,22 +10,48 @@ services:
   - name: maxevo-app
     source_dir: /
     github:
-      repo: your-github-username/maxevo-system
+      repo: BentleyRolling/maxevo
       branch: main
       deploy_on_push: true
     
     # Build configuration
     build_command: |
       echo "🚀 Starting MaxEvo build process..."
-      cd api && npm ci --only=production --no-audit --no-fund
-      cd ../client && npm ci --only=production --no-audit --no-fund
+      echo "Node version: $(node --version)"
+      echo "NPM version: $(npm --version)"
+      
+      # Install API dependencies
+      echo "📦 Installing API dependencies..."
+      cd api
+      npm ci --only=production --no-audit --no-fund --progress=false
+      echo "✅ API dependencies installed"
+      
+      # Install client dependencies and build
+      echo "📦 Installing client dependencies..."
+      cd ../client
+      npm ci --only=production --no-audit --no-fund --progress=false
+      echo "🔨 Building client..."
       npm run build
+      echo "✅ Client build completed"
+      
+      # Verify build
+      cd ..
+      echo "📋 Build verification:"
+      echo "API package.json exists: $(test -f api/package.json && echo 'YES' || echo 'NO')"
+      echo "Client dist exists: $(test -d client/dist && echo 'YES' || echo 'NO')"
+      echo "MaxEvo services exist: $(ls api/server/services/MaxEvo*.js | wc -l) files"
       echo "✅ MaxEvo build completed successfully"
     
     # Runtime configuration
     run_command: |
       echo "🌟 Starting MaxEvo AI Operating System..."
-      cd api && node server/index.js
+      echo "Environment: $NODE_ENV"
+      echo "Port: $PORT"
+      echo "Host: $HOST"
+      cd api
+      echo "Starting server from: $(pwd)"
+      echo "Server file exists: $(test -f server/index.js && echo 'YES' || echo 'NO')"
+      node server/index.js
     
     environment_slug: node-js
     instance_count: 1
@@ -63,18 +89,18 @@ services:
       - key: HELP_AND_FAQ_URL
         value: "https://docs.maxevo.ai"
       
-      # Security settings (THESE MUST BE CHANGED!)
+      # Security settings - Generate secure random values for production
       - key: JWT_SECRET
-        value: "CHANGE-THIS-IN-PRODUCTION-TO-SECURE-RANDOM-STRING-64-CHARS"
+        value: "maxevo-jwt-secret-2024-production-deployment-secure-key-change-this"
         type: SECRET
       - key: JWT_REFRESH_SECRET  
-        value: "CHANGE-THIS-IN-PRODUCTION-TO-SECURE-RANDOM-STRING-64-CHARS"
+        value: "maxevo-refresh-secret-2024-production-deployment-secure-key-change-this"
         type: SECRET
       - key: CREDS_KEY
-        value: "CHANGE-THIS-IN-PRODUCTION-TO-SECURE-RANDOM-STRING-32-CHARS"
+        value: "maxevo-creds-key-2024-secure-32-char"
         type: SECRET  
       - key: CREDS_IV
-        value: "CHANGE-THIS-IN-PRODUCTION-TO-SECURE-RANDOM-STRING-16-CHARS"
+        value: "maxevo-iv-16-char"
         type: SECRET
       
       # Session settings
@@ -234,99 +260,5 @@ services:
       - key: ANTHROPIC_MODELS
         value: "claude-3-sonnet-20240229,claude-3-haiku-20240307"
 
-# Database configuration (optional - app will run without it)
-databases:
-  - name: maxevo-mongodb
-    engine: MONGODB
-    version: "6"
-    size: basic
-    num_nodes: 1
-
-# Static site configuration (optional)
-static_sites:
-  - name: maxevo-docs
-    source_dir: /docs
-    github:
-      repo: your-github-username/maxevo-system
-      branch: main
-      deploy_on_push: true
-    build_command: echo "No build needed for static docs"
-    output_dir: /docs
-
-# Domain configuration (to be updated after deployment)
-domains:
-  - domain: maxevo-app.ondigitalocean.app
-    type: PRIMARY
-    
-# Worker services for background tasks (optional)
-workers:
-  - name: maxevo-scheduler
-    source_dir: /
-    github:
-      repo: your-github-username/maxevo-system  
-      branch: main
-      deploy_on_push: true
-    
-    build_command: |
-      echo "🔧 Building MaxEvo scheduler worker..."
-      cd api && npm ci --only=production --no-audit --no-fund
-      echo "✅ MaxEvo scheduler worker build completed"
-    
-    run_command: |
-      echo "⏰ Starting MaxEvo scheduler worker..."
-      cd api && node -e "
-        const { MaxEvoScheduler } = require('./server/services/MaxEvoScheduler');
-        const scheduler = new MaxEvoScheduler();
-        scheduler.initialize().then(() => {
-          console.log('MaxEvo scheduler worker started successfully');
-          scheduler.startMainLoop();
-        }).catch(console.error);
-      "
-    
-    environment_slug: node-js
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    
-    # Same environment variables as main app
-    envs:
-      - key: NODE_ENV
-        value: production
-      - key: MAXEVO_WORKER_MODE
-        value: "scheduler"
-      - key: LOG_LEVEL
-        value: "info"
-
-# Jobs for one-time tasks (optional)
-jobs:
-  - name: maxevo-setup
-    source_dir: /
-    github:
-      repo: your-github-username/maxevo-system
-      branch: main
-    
-    build_command: |
-      echo "🔧 Building MaxEvo setup job..."
-      cd api && npm ci --only=production --no-audit --no-fund
-      echo "✅ MaxEvo setup job build completed"
-    
-    run_command: |
-      echo "🚀 Running MaxEvo initial setup..."
-      cd api && node -e "
-        console.log('MaxEvo initial setup completed');
-        console.log('🌟 MaxEvo AI Operating System is ready!');
-        console.log('🤖 Multi-agent collaboration system initialized');
-        console.log('📡 WebSocket server configured');
-        console.log('⏰ Scheduled task system ready');
-        console.log('🧠 Memory core and resurrection protocol enabled');
-        console.log('🔒 Terminal takeover system configured');
-      "
-    
-    environment_slug: node-js
-    instance_size_slug: basic-xxs
-    
-    # Job-specific environment variables
-    envs:
-      - key: NODE_ENV
-        value: production
-      - key: MAXEVO_SETUP_MODE
-        value: "true"
+# Minimal deployment - focus on main app service only
+# Additional services can be added after successful deployment
