@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 const MaxEvoMultiAgent = require('./MaxEvoMultiAgent');
 
 /**

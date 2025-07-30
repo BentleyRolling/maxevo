@@ -1,4 +1,4 @@
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 const { getTaskRunner } = require('./task-runner');
 const MaxEvoWebSocket = require('./MaxEvoWebSocket');
 

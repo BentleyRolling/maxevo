@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 const MaxEvoCore = require('./MaxEvoCore');
 const AgentRouter = require('./MaxEvoAgentRouter');
 

@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events');
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 
 /**
  * MaxEvo Multi-Agent Chat System

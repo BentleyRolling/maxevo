@@ -1,4 +1,4 @@
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 const MaxEvoCore = require('./MaxEvoCore');
 const MaxEvoScheduler = require('./MaxEvoScheduler');
 const MaxEvoAgentRouter = require('./MaxEvoAgentRouter');

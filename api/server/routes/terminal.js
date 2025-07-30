@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 const { requireJwtAuth } = require('~/server/middleware');
 const MaxEvoTerminal = require('~/server/services/MaxEvoTerminal');
 const MaxEvoCore = require('~/server/services/MaxEvoCore');

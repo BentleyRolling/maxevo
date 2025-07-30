@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { logger } = require('~/utils');
+const { logger } = require('~/utils/logger');
 
 /**
  * MaxEvo Memory Core - Persistent state management system
