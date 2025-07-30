@@ -10,15 +10,25 @@ const MaxEvoCore = require('~/server/services/MaxEvoCore');
 const router = Router();
 
 // Initialize MaxEvo Core
-let maxevoCore;
-(async () => {
+let maxevoCore = null;
+let maxevoCoreInitialized = false;
+
+const initializeMaxEvoCore = async () => {
+  if (maxevoCoreInitialized) return maxevoCore;
+  
   try {
     maxevoCore = new MaxEvoCore();
     await maxevoCore.initialize();
+    maxevoCoreInitialized = true;
+    logger.info('[MCP Routes] MaxEvo Core initialized successfully');
+    return maxevoCore;
   } catch (error) {
-    logger.error('[MCP Routes] Failed to initialize MaxEvo Core:', error);
+    logger.warn('[MCP Routes] MaxEvo Core initialization failed, using fallback mode:', error?.message || 'Unknown error');
+    maxevoCore = null;
+    maxevoCoreInitialized = true;
+    return null;
   }
-})();
+};
 
 /**
  * Initiate OAuth flow
@@ -225,8 +235,9 @@ router.get('/oauth/status/:flowId', async (req, res) => {
  */
 router.post('/trigger', requireJwtAuth, async (req, res) => {
   try {
-    if (!maxevoCore) {
-      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    const core = await initializeMaxEvoCore();
+    if (!core) {
+      return res.status(503).json({ error: 'MaxEvo Core not available' });
     }
 
     const { task, agent, payload, runAt, priority = 'medium' } = req.body;
@@ -251,7 +262,7 @@ router.post('/trigger', requireJwtAuth, async (req, res) => {
       taskData.status = 'scheduled';
     }
 
-    const createdTask = await maxevoCore.addTask(taskData);
+    const createdTask = await core.addTask(taskData);
     
     logger.info(`[MCP Trigger] Task created: ${createdTask.id} by user ${req.user.id}`);
     
@@ -273,8 +284,9 @@ router.post('/trigger', requireJwtAuth, async (req, res) => {
  */
 router.post('/log', requireJwtAuth, async (req, res) => {
   try {
-    if (!maxevoCore) {
-      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    const core = await initializeMaxEvoCore();
+    if (!core) {
+      return res.status(503).json({ error: 'MaxEvo Core not available' });
     }
 
     const { level, message, agent, taskId, metadata } = req.body;
@@ -296,7 +308,7 @@ router.post('/log', requireJwtAuth, async (req, res) => {
 
     // Update agent status if provided
     if (agent && taskId) {
-      await maxevoCore.updateAgentStatus(agent, 'active', taskId);
+      await core.updateAgentStatus(agent, 'active', taskId);
     }
 
     res.json({ success: true, logged: true });
@@ -313,12 +325,13 @@ router.post('/log', requireJwtAuth, async (req, res) => {
  */
 router.get('/fetchMemory', requireJwtAuth, async (req, res) => {
   try {
-    if (!maxevoCore) {
-      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    const core = await initializeMaxEvoCore();
+    if (!core) {
+      return res.status(503).json({ error: 'MaxEvo Core not available' });
     }
 
     const { type, agent, taskId } = req.query;
-    const state = maxevoCore.getState();
+    const state = core.getState();
     
     let responseData = {};
 
