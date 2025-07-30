@@ -1,0 +1,7 @@
+version: "3.4"
+services:
+  client:
+    volumes:
+      - ./client/public/assets/favicon-16x16.png:/app/client/dist/assets/favicon-16x16.png
+      - ./client/public/assets/favicon-32x32.png:/app/client/dist/assets/favicon-32x32.png
+      - ./client/public/assets/logo.png:/app/client/dist/assets/logo.png

@@ -5,8 +5,20 @@ const { CacheKeys } = require('librechat-data-provider');
 const { requireJwtAuth } = require('~/server/middleware');
 const { getFlowStateManager } = require('~/config');
 const { getLogStores } = require('~/cache');
+const MaxEvoCore = require('~/server/services/MaxEvoCore');
 
 const router = Router();
+
+// Initialize MaxEvo Core
+let maxevoCore;
+(async () => {
+  try {
+    maxevoCore = new MaxEvoCore();
+    await maxevoCore.initialize();
+  } catch (error) {
+    logger.error('[MCP Routes] Failed to initialize MaxEvo Core:', error);
+  }
+})();
 
 /**
  * Initiate OAuth flow
@@ -199,6 +211,248 @@ router.get('/oauth/status/:flowId', async (req, res) => {
   } catch (error) {
     logger.error('[MCP OAuth] Failed to get flow status', error);
     res.status(500).json({ error: 'Failed to get flow status' });
+  }
+});
+
+/**
+ * MaxEvo MCP Host Endpoints
+ * Core endpoints for MaxEvo AI Operating System
+ */
+
+/**
+ * Trigger a MaxEvo task or workflow
+ * POST /mcp/trigger
+ */
+router.post('/trigger', requireJwtAuth, async (req, res) => {
+  try {
+    if (!maxevoCore) {
+      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    }
+
+    const { task, agent, payload, runAt, priority = 'medium' } = req.body;
+    
+    if (!task) {
+      return res.status(400).json({ error: 'Task is required' });
+    }
+
+    // Create task object
+    const taskData = {
+      task,
+      agent: agent || 'claude',
+      payload: payload || {},
+      priority,
+      triggeredBy: req.user.id,
+      triggeredAt: new Date().toISOString()
+    };
+
+    // If runAt is specified, it's a scheduled task
+    if (runAt) {
+      taskData.runAt = runAt;
+      taskData.status = 'scheduled';
+    }
+
+    const createdTask = await maxevoCore.addTask(taskData);
+    
+    logger.info(`[MCP Trigger] Task created: ${createdTask.id} by user ${req.user.id}`);
+    
+    res.json({
+      success: true,
+      task: createdTask,
+      message: runAt ? 'Task scheduled successfully' : 'Task queued successfully'
+    });
+
+  } catch (error) {
+    logger.error('[MCP Trigger] Failed to trigger task:', error);
+    res.status(500).json({ error: 'Failed to trigger task' });
+  }
+});
+
+/**
+ * Log MaxEvo system events and agent activities
+ * POST /mcp/log
+ */
+router.post('/log', requireJwtAuth, async (req, res) => {
+  try {
+    if (!maxevoCore) {
+      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    }
+
+    const { level, message, agent, taskId, metadata } = req.body;
+    
+    if (!level || !message) {
+      return res.status(400).json({ error: 'Level and message are required' });
+    }
+
+    // Log the event using Winston
+    const logData = {
+      agent: agent || 'system',
+      taskId: taskId || null,
+      userId: req.user.id,
+      metadata: metadata || {},
+      timestamp: new Date().toISOString()
+    };
+
+    logger[level] || logger.info(`[MaxEvo ${agent || 'System'}] ${message}`, logData);
+
+    // Update agent status if provided
+    if (agent && taskId) {
+      await maxevoCore.updateAgentStatus(agent, 'active', taskId);
+    }
+
+    res.json({ success: true, logged: true });
+
+  } catch (error) {
+    logger.error('[MCP Log] Failed to log event:', error);
+    res.status(500).json({ error: 'Failed to log event' });
+  }
+});
+
+/**
+ * Fetch MaxEvo memory and system state
+ * GET /mcp/fetchMemory
+ */
+router.get('/fetchMemory', requireJwtAuth, async (req, res) => {
+  try {
+    if (!maxevoCore) {
+      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    }
+
+    const { type, agent, taskId } = req.query;
+    const state = maxevoCore.getState();
+    
+    let responseData = {};
+
+    switch (type) {
+      case 'full':
+        responseData = state;
+        break;
+      case 'agents':
+        responseData = state.agents;
+        break;
+      case 'memory':
+        responseData = state.memory;
+        break;
+      case 'tasks':
+        responseData = {
+          pending: maxevoCore.getTasks('pending'),
+          scheduled: maxevoCore.getTasks('scheduled'),
+          active: maxevoCore.getTasks('active')
+        };
+        break;
+      case 'agent':
+        if (agent && state.agents[agent]) {
+          responseData = state.agents[agent];
+        } else {
+          return res.status(404).json({ error: 'Agent not found' });
+        }
+        break;
+      case 'resurrection':
+        responseData = maxevoCore.getResurrectionData();
+        break;
+      default:
+        responseData = {
+          systemInfo: state.systemInfo,
+          activeAgents: Object.keys(state.agents).filter(
+            agentName => state.agents[agentName].status === 'active'
+          ),
+          pendingTasks: maxevoCore.getTasks('pending').length,
+          lastUpdated: state.lastUpdated
+        };
+    }
+
+    logger.debug(`[MCP FetchMemory] Memory fetched (type: ${type}) by user ${req.user.id}`);
+    
+    res.json({
+      success: true,
+      data: responseData,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('[MCP FetchMemory] Failed to fetch memory:', error);
+    res.status(500).json({ error: 'Failed to fetch memory' });
+  }
+});
+
+/**
+ * Get MaxEvo system status
+ * GET /mcp/status
+ */
+router.get('/status', requireJwtAuth, async (req, res) => {
+  try {
+    if (!maxevoCore) {
+      return res.status(503).json({ 
+        error: 'MaxEvo Core not initialized',
+        status: 'offline'
+      });
+    }
+
+    const state = maxevoCore.getState();
+    const tasks = maxevoCore.getTasks();
+    
+    const status = {
+      system: 'online',
+      version: state.version,
+      uptime: Date.now() - new Date(state.systemInfo.lastRestart).getTime(),
+      agents: state.agents,
+      tasks: {
+        pending: tasks.filter(t => t.status === 'pending').length,
+        scheduled: tasks.filter(t => t.status === 'scheduled').length,
+        active: tasks.filter(t => t.status === 'active').length
+      },
+      memory: {
+        conversations: Object.keys(state.memory.conversations).length,
+        contexts: Object.keys(state.memory.contexts).length,
+        learnings: Object.keys(state.memory.learnings).length
+      },
+      lastUpdated: state.lastUpdated
+    };
+
+    res.json({
+      success: true,
+      status
+    });
+
+  } catch (error) {
+    logger.error('[MCP Status] Failed to get status:', error);
+    res.status(500).json({ 
+      error: 'Failed to get status',
+      status: 'error'
+    });
+  }
+});
+
+/**
+ * Update MaxEvo agent status
+ * POST /mcp/agent/:agentName/status
+ */
+router.post('/agent/:agentName/status', requireJwtAuth, async (req, res) => {
+  try {
+    if (!maxevoCore) {
+      return res.status(503).json({ error: 'MaxEvo Core not initialized' });
+    }
+
+    const { agentName } = req.params;
+    const { status, currentTask, metadata } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ error: 'Status is required' });
+    }
+
+    await maxevoCore.updateAgentStatus(agentName, status, currentTask);
+    
+    logger.info(`[MCP Agent] ${agentName} status updated to ${status} by user ${req.user.id}`);
+    
+    res.json({
+      success: true,
+      agent: agentName,
+      status,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    logger.error('[MCP Agent] Failed to update agent status:', error);
+    res.status(500).json({ error: 'Failed to update agent status' });
   }
 });
 

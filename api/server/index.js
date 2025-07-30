@@ -17,6 +17,7 @@ const validateImageRequest = require('./middleware/validateImageRequest');
 const { jwtLogin, ldapLogin, passportLogin } = require('~/strategies');
 const errorController = require('./controllers/ErrorController');
 const initializeMCP = require('./services/initializeMCP');
+const { initializeMaxEvo } = require('./services/initializeMaxEvo');
 const configureSocialLogins = require('./socialLogins');
 const AppService = require('./services/AppService');
 const staticCache = require('./utils/staticCache');
@@ -120,6 +121,7 @@ const startServer = async () => {
   app.use('/api/memories', routes.memories);
   app.use('/api/tags', routes.tags);
   app.use('/api/mcp', routes.mcp);
+  app.use('/api/terminal', routes.terminal);
 
   app.use((req, res) => {
     res.set({
@@ -135,7 +137,7 @@ const startServer = async () => {
     res.send(updatedIndexHtml);
   });
 
-  app.listen(port, host, () => {
+  const server = app.listen(port, host, async () => {
     if (host === '0.0.0.0') {
       logger.info(
         `Server listening on all interfaces at port ${port}. Use http://localhost:${port} to access it`,
@@ -144,7 +146,16 @@ const startServer = async () => {
       logger.info(`Server listening at http://${host == '0.0.0.0' ? 'localhost' : host}:${port}`);
     }
 
+    // Initialize existing MCP system
     initializeMCP(app);
+    
+    // Initialize MaxEvo AI Operating System
+    try {
+      await initializeMaxEvo(app, server);
+      logger.info('🌟 MaxEvo AI Operating System is now online!');
+    } catch (error) {
+      logger.error('❌ MaxEvo initialization failed:', error);
+    }
   });
 };
 
