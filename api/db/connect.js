@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) {
-  throw new Error('Please define the MONGO_URI environment variable');
+  console.warn('WARNING: MONGO_URI not defined - MaxEvo will run in standalone mode');
+  // Don't throw error, allow graceful fallback
 }
 
 /**
@@ -18,6 +19,12 @@ if (!cached) {
 }
 
 async function connectDb() {
+  // Return null if no MONGO_URI - allow graceful fallback
+  if (!MONGO_URI) {
+    console.warn('MongoDB connection skipped - no MONGO_URI provided');
+    return null;
+  }
+
   if (cached.conn && cached.conn?._readyState === 1) {
     return cached.conn;
   }

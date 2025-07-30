@@ -24,30 +24,50 @@ class MaxEvoTaskRunner {
     try {
       logger.info('[MaxEvo Task Runner] Initializing...');
 
-      // Initialize core components
+      // Initialize core components with error handling
       this.core = new MaxEvoCore();
-      await this.core.initialize();
+      await this.core.initialize().catch(error => {
+        logger.warn('[MaxEvo Task Runner] Core initialization failed, using fallback mode:', error.message);
+        return null;
+      });
 
-      this.router = new MaxEvoAgentRouter(this.core);
-      await this.router.initialize();
+      if (this.core) {
+        this.router = new MaxEvoAgentRouter(this.core);
+        await this.router.initialize().catch(error => {
+          logger.warn('[MaxEvo Task Runner] Router initialization failed:', error.message);
+          this.router = null;
+        });
 
-      this.scheduler = new MaxEvoScheduler();
-      await this.scheduler.initialize();
+        this.scheduler = new MaxEvoScheduler();
+        await this.scheduler.initialize().catch(error => {
+          logger.warn('[MaxEvo Task Runner] Scheduler initialization failed:', error.message);
+          this.scheduler = null;
+        });
 
-      // Setup default recurring tasks
-      await this.setupDefaultTasks();
+        // Setup default recurring tasks only if scheduler is available
+        if (this.scheduler) {
+          await this.setupDefaultTasks().catch(error => {
+            logger.warn('[MaxEvo Task Runner] Default tasks setup failed:', error.message);
+          });
+        }
+
+        // Update system status if core is available
+        try {
+          await this.core.updateState({
+            systemInfo: {
+              ...this.core.getState().systemInfo,
+              lastRestart: new Date().toISOString(),
+              status: this.router && this.scheduler ? 'online' : 'partial'
+            }
+          });
+        } catch (error) {
+          logger.warn('[MaxEvo Task Runner] Failed to update system status:', error.message);
+        }
+      }
 
       this.isRunning = true;
-      logger.info('[MaxEvo Task Runner] Initialization complete - System online');
-
-      // Update system status
-      await this.core.updateState({
-        systemInfo: {
-          ...this.core.getState().systemInfo,
-          lastRestart: new Date().toISOString(),
-          status: 'online'
-        }
-      });
+      const status = this.core && this.router && this.scheduler ? 'fully online' : 'running in fallback mode';
+      logger.info(`[MaxEvo Task Runner] Initialization complete - System ${status}`);
 
     } catch (error) {
       logger.error('[MaxEvo Task Runner] Initialization failed:', error);
