@@ -37,9 +37,15 @@ const startServer = async () => {
   if (typeof Bun !== 'undefined') {
     axios.defaults.headers.common['Accept-Encoding'] = 'gzip';
   }
-  await connectDb();
-
-  logger.info('Connected to MongoDB');
+  
+  try {
+    await connectDb();
+    logger.info('Connected to MongoDB');
+  } catch (error) {
+    logger.error('MongoDB connection failed:', error);
+    logger.warn('MaxEvo will start in standalone mode without MongoDB');
+    // Continue without MongoDB for now
+  }
   indexSync().catch((err) => {
     logger.error('[indexSync] Background sync failed:', err);
   });
@@ -155,6 +161,7 @@ const startServer = async () => {
       logger.info('🌟 MaxEvo AI Operating System is now online!');
     } catch (error) {
       logger.error('❌ MaxEvo initialization failed:', error);
+      logger.warn('Server will continue running in basic mode');
     }
   });
 };

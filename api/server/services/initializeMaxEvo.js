@@ -12,12 +12,19 @@ async function initializeMaxEvo(app, server) {
 
     // Initialize Task Runner (includes Memory Core, Scheduler, Agent Router)
     logger.info('[MaxEvo] Initializing Task Runner...');
-    const taskRunner = await getTaskRunner();
+    const taskRunner = await getTaskRunner().catch(error => {
+      logger.warn('[MaxEvo] Task Runner initialization failed, using fallback mode:', error.message);
+      return null;
+    });
     
     // Store task runner reference globally for API access
     app.locals.maxevoTaskRunner = taskRunner;
     
-    logger.info('[MaxEvo] Task Runner initialized successfully');
+    if (taskRunner) {
+      logger.info('[MaxEvo] Task Runner initialized successfully');
+    } else {
+      logger.warn('[MaxEvo] Task Runner not available - basic mode only');
+    }
 
     // Initialize WebSocket server for real-time multi-agent communication
     if (server) {
