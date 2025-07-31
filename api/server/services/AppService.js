@@ -36,7 +36,13 @@ const paths = require('~/config/paths');
  * @param {Express.Application} app - The Express application object.
  */
 const AppService = async (app) => {
-  await initializeRoles();
+  // Initialize roles with error handling for MongoDB connection issues
+  try {
+    await initializeRoles();
+  } catch (error) {
+    console.warn('⚠️ Role initialization failed - continuing without roles:', error.message);
+    // Continue without roles initialization if MongoDB is not available
+  }
   /** @type {TCustomConfig} */
   const config = (await loadCustomConfig()) ?? {};
   const configDefaults = getConfigDefaults();

@@ -1,8 +1,17 @@
 const { Router } = require('express');
-const { logger } = require('~/utils/logger');
 const { requireJwtAuth } = require('~/server/middleware');
 const MaxEvoTerminal = require('~/server/services/MaxEvoTerminal');
 const MaxEvoCore = require('~/server/services/MaxEvoCore');
+
+// Safe logger initialization with fallback
+let logger;
+try {
+  const loggerModule = require('~/utils/logger');
+  logger = loggerModule.logger || loggerModule || console;
+} catch (error) {
+  console.warn('⚠️ Terminal routes: Logger initialization failed, using console fallback');
+  logger = console;
+}
 
 const router = Router();
 

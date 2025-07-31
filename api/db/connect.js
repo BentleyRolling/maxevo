@@ -32,7 +32,8 @@ async function connectDb() {
   const disconnected = cached.conn && cached.conn?._readyState !== 1;
   if (!cached.promise || disconnected) {
     const opts = {
-      bufferCommands: false,
+      bufferCommands: true, // Enable buffering for production stability
+      maxBufferSize: -1,
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
       // bufferMaxEntries: 0,
