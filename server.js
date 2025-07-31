@@ -365,71 +365,15 @@ if (NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     const indexPath = path.join(__dirname, 'dist', 'index.html')
     
-    // Check if built frontend exists
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath)
-    } else {
-      // Fallback HTML page if build failed
-      res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxEvo AI - System Online</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #1a1a1a; color: #fff; font-family: system-ui; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center">
-    <div class="text-center max-w-2xl mx-auto p-8">
-        <div class="gradient-bg w-24 h-24 rounded-full mx-auto mb-8 flex items-center justify-center">
-            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-        </div>
-        
-        <h1 class="text-4xl font-bold mb-4">MaxEvo AI System</h1>
-        <p class="text-xl text-gray-300 mb-8">AI Orchestration Platform - Online</p>
-        
-        <div class="bg-gray-800 rounded-lg p-6 mb-8">
-            <h2 class="text-2xl font-semibold mb-4">🚀 System Status</h2>
-            <div class="grid grid-cols-2 gap-4 text-left">
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                    <span>Backend Server</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                    <span>WebSocket</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                    <span>Agent Router</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                    <span>Task Scheduler</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="space-y-4">
-            <a href="/api/status" class="inline-block bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors">
-                View System Status
-            </a>
-            <div class="text-sm text-gray-500">
-                <p>Frontend build in progress...</p>
-                <p>Full interface coming soon!</p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-      `)
-    }
+    // Force serve React app - we know it exists because we committed it
+    console.log('🚀 Serving MaxEvo React ChatGPT interface')
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('❌ Error serving React app:', err)
+        // Emergency fallback - should never happen now
+        res.status(500).send('<h1>MaxEvo React App Error</h1><p>Could not load interface. Check server logs.</p>')
+      }
+    })
   })
 }
 
