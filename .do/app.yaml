@@ -22,8 +22,9 @@ services:
       echo "✅ Dependencies installed"
       
       # Build frontend with Vite
-      npm run build
-      echo "✅ Frontend built"
+      echo "🔨 Starting Vite build..."
+      npm run build 2>&1 || { echo "❌ Build failed"; exit 1; }
+      echo "✅ Frontend built successfully"
       
       # Install only production dependencies for runtime
       npm prune --production

@@ -3,6 +3,7 @@ const cors = require('cors')
 const WebSocket = require('ws')
 const http = require('http')
 const path = require('path')
+const fs = require('fs')
 
 // Mock MaxEvo services for standalone deployment
 class MockMaxEvoCore {
@@ -365,7 +366,7 @@ if (NODE_ENV === 'production') {
     const indexPath = path.join(__dirname, 'dist', 'index.html')
     
     // Check if built frontend exists
-    if (require('fs').existsSync(indexPath)) {
+    if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath)
     } else {
       // Fallback HTML page if build failed
