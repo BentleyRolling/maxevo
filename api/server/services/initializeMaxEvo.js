@@ -27,33 +27,49 @@ async function initializeMaxEvo(app, server) {
     }
 
     // Initialize WebSocket server for real-time multi-agent communication
-    if (server) {
-      logger.info('[MaxEvo] Initializing WebSocket server...');
-      const maxevoCore = taskRunner.core;
-      const webSocketServer = new MaxEvoWebSocket(server, maxevoCore);
-      await webSocketServer.initialize();
-      
-      // Store WebSocket server reference
-      app.locals.maxevoWebSocket = webSocketServer;
-      
-      // Set up cleanup interval for dead connections
-      setInterval(() => {
-        webSocketServer.cleanup();
-      }, 60000); // Clean up every minute
+    if (server && taskRunner && taskRunner.core) {
+      try {
+        logger.info('[MaxEvo] Initializing WebSocket server...');
+        const maxevoCore = taskRunner.core;
+        const webSocketServer = new MaxEvoWebSocket(server, maxevoCore);
+        await webSocketServer.initialize();
+        
+        // Store WebSocket server reference
+        app.locals.maxevoWebSocket = webSocketServer;
+        
+        // Set up cleanup interval for dead connections
+        setInterval(() => {
+          try {
+            webSocketServer.cleanup();
+          } catch (error) {
+            logger.warn('[MaxEvo] WebSocket cleanup error:', error.message);
+          }
+        }, 60000); // Clean up every minute
 
-      logger.info('[MaxEvo] WebSocket server initialized successfully');
+        logger.info('[MaxEvo] WebSocket server initialized successfully');
+      } catch (error) {
+        logger.warn('[MaxEvo] WebSocket server initialization failed:', error.message);
+      }
     } else {
-      logger.warn('[MaxEvo] HTTP server not provided - WebSocket functionality disabled');
+      logger.warn('[MaxEvo] WebSocket server disabled - HTTP server or MaxEvo core not available');
     }
 
     // Log system status
-    const status = taskRunner.getStatus();
-    logger.info('[MaxEvo] System Status:', {
-      core: status.core,
-      scheduler: status.scheduler,
-      router: status.router,
-      isRunning: status.isRunning
-    });
+    if (taskRunner) {
+      try {
+        const status = taskRunner.getStatus();
+        logger.info('[MaxEvo] System Status:', {
+          core: status.core,
+          scheduler: status.scheduler,
+          router: status.router,
+          isRunning: status.isRunning
+        });
+      } catch (error) {
+        logger.warn('[MaxEvo] Could not get system status:', error.message);
+      }
+    } else {
+      logger.info('[MaxEvo] System Status: Running in fallback mode');
+    }
 
     // Set up graceful shutdown
     const gracefulShutdown = async () => {
@@ -82,9 +98,11 @@ async function initializeMaxEvo(app, server) {
     // Schedule periodic system health checks
     setInterval(async () => {
       try {
-        const healthStatus = taskRunner.getStatus();
-        if (!healthStatus.isRunning) {
-          logger.warn('[MaxEvo] System health check failed - Task Runner not running');
+        if (taskRunner) {
+          const healthStatus = taskRunner.getStatus();
+          if (!healthStatus.isRunning) {
+            logger.warn('[MaxEvo] System health check failed - Task Runner not running');
+          }
         }
         
         // Log memory usage

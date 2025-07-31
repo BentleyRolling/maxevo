@@ -27,7 +27,8 @@ const routes = require('./routes');
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
 
 // Allow PORT=0 to be used for automatic free port assignment
-const port = isNaN(Number(PORT)) ? 3080 : Number(PORT);
+// Default to 8080 for DigitalOcean App Platform compatibility
+const port = isNaN(Number(PORT)) ? 8080 : Number(PORT);
 const host = HOST || 'localhost';
 const trusted_proxy = Number(TRUST_PROXY) || 1; /* trust first proxy by default */
 
@@ -153,7 +154,12 @@ const startServer = async () => {
     }
 
     // Initialize existing MCP system
-    initializeMCP(app);
+    try {
+      initializeMCP(app);
+      logger.info('✅ MCP system initialized');
+    } catch (error) {
+      logger.warn('⚠️ MCP initialization failed, continuing without MCP:', error.message);
+    }
     
     // Initialize MaxEvo AI Operating System
     try {
@@ -170,25 +176,47 @@ startServer();
 
 let messageCount = 0;
 process.on('uncaughtException', (err) => {
+  // Ensure logger exists before using it
+  const safeLogger = logger || console;
+  const logError = safeLogger.error || console.error;
+  const logWarn = safeLogger.warn || console.warn;
+  
   if (!err.message.includes('fetch failed')) {
-    logger.error('There was an uncaught error:', err);
+    try {
+      logError('There was an uncaught error:', err);
+    } catch (loggerError) {
+      console.error('There was an uncaught error:', err);
+      console.error('Logger also failed:', loggerError);
+    }
   }
 
   if (err.message.includes('abort')) {
-    logger.warn('There was an uncatchable AbortController error.');
+    try {
+      logWarn('There was an uncatchable AbortController error.');
+    } catch (e) {
+      console.warn('There was an uncatchable AbortController error.');
+    }
     return;
   }
 
   if (err.message.includes('GoogleGenerativeAI')) {
-    logger.warn(
-      '\n\n`GoogleGenerativeAI` errors cannot be caught due to an upstream issue, see: https://github.com/google-gemini/generative-ai-js/issues/303',
-    );
+    try {
+      logWarn(
+        '\n\n`GoogleGenerativeAI` errors cannot be caught due to an upstream issue, see: https://github.com/google-gemini/generative-ai-js/issues/303',
+      );
+    } catch (e) {
+      console.warn('GoogleGenerativeAI error occurred');
+    }
     return;
   }
 
   if (err.message.includes('fetch failed')) {
     if (messageCount === 0) {
-      logger.warn('Meilisearch error, search will be disabled');
+      try {
+        logWarn('Meilisearch error, search will be disabled');
+      } catch (e) {
+        console.warn('Meilisearch error, search will be disabled');
+      }
       messageCount++;
     }
 
@@ -196,9 +224,13 @@ process.on('uncaughtException', (err) => {
   }
 
   if (err.message.includes('OpenAIError') || err.message.includes('ChatCompletionMessage')) {
-    logger.error(
-      '\n\nAn Uncaught `OpenAIError` error may be due to your reverse-proxy setup or stream configuration, or a bug in the `openai` node package.',
-    );
+    try {
+      logError(
+        '\n\nAn Uncaught `OpenAIError` error may be due to your reverse-proxy setup or stream configuration, or a bug in the `openai` node package.',
+      );
+    } catch (e) {
+      console.error('OpenAI error occurred');
+    }
     return;
   }
 
