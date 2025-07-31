@@ -1,14 +1,11 @@
-# MaxEvo AI Operating System - DigitalOcean App Platform Configuration
-# Optimized for production deployment with comprehensive error handling
+# MaxEvo UI - DigitalOcean App Platform Configuration
+# Clean, simple deployment for MaxEvo AI Orchestration System
 
-name: maxevo-ai-system
+name: maxevo-ui
 region: nyc
 
-# Services configuration
 services:
-  # Main MaxEvo application service
-  - name: maxevo-app
-    source_dir: /
+  - name: maxevo-ui
     github:
       repo: BentleyRolling/maxevo
       branch: main
@@ -16,40 +13,30 @@ services:
     
     # Build configuration
     build_command: |
-      echo "🚀 Starting MaxEvo build process..."
+      echo "🚀 Building MaxEvo UI..."
       echo "Node version: $(node --version)"
       echo "NPM version: $(npm --version)"
       
-      # Install API dependencies
-      echo "📦 Installing API dependencies..."
-      cd api
-      npm ci --only=production --no-audit --no-fund --progress=false
-      echo "✅ API dependencies installed"
+      # Install dependencies
+      npm ci --only=production --no-audit --no-fund
+      echo "✅ Dependencies installed"
       
-      # Install client dependencies and build
-      echo "📦 Installing client dependencies..."
-      cd ../client
-      npm ci --only=production --no-audit --no-fund --progress=false
-      echo "🔨 Building client..."
+      # Build frontend
       npm run build
-      echo "✅ Client build completed"
+      echo "✅ Frontend built"
       
       # Verify build
-      cd ..
-      echo "📋 Build verification:"
-      echo "API package.json exists: $(test -f api/package.json && echo 'YES' || echo 'NO')"
-      echo "Client dist exists: $(test -d client/dist && echo 'YES' || echo 'NO')"
-      echo "MaxEvo services exist: $(ls api/server/services/MaxEvo*.js | wc -l) files"
-      echo "✅ MaxEvo build completed successfully"
+      echo "Build verification:"
+      echo "Server exists: $(test -f server.js && echo 'YES' || echo 'NO')"
+      echo "Frontend dist exists: $(test -d dist && echo 'YES' || echo 'NO')"
+      echo "✅ MaxEvo UI build completed successfully"
     
     # Runtime configuration
     run_command: |
-      echo "🌟 Starting MaxEvo AI Operating System..."
+      echo "🌟 Starting MaxEvo UI..."
       echo "Environment: $NODE_ENV"
       echo "Port: $PORT"
-      echo "Host: $HOST"
-      echo "Using production startup script to avoid port conflicts..."
-      node start-production.js
+      node server.js
     
     environment_slug: node-js
     instance_count: 1
@@ -58,205 +45,35 @@ services:
     # Health check configuration
     health_check:
       http_path: /health
-      initial_delay_seconds: 90
-      period_seconds: 30
-      timeout_seconds: 15
-      failure_threshold: 5
+      initial_delay_seconds: 30
+      period_seconds: 15
+      timeout_seconds: 10
+      failure_threshold: 3
       success_threshold: 2
     
-    # HTTP configuration  
+    # HTTP configuration
     http_port: 8080
     
     # Environment variables
     envs:
-      # Core application settings
+      # Core settings
       - key: NODE_ENV
         value: production
       - key: PORT
         value: "8080"
-      - key: HOST  
+      - key: HOST
         value: "0.0.0.0"
-      - key: TRUST_PROXY
-        value: "1"
       
-      # MaxEvo branding
-      - key: APP_TITLE
-        value: "MaxEvo AI Operating System"
-      - key: CUSTOM_FOOTER
-        value: "Powered by MaxEvo Multi-Agent System"
-      - key: HELP_AND_FAQ_URL
-        value: "https://docs.maxevo.ai"
-      
-      # Security settings - Generate secure random values for production
-      - key: JWT_SECRET
-        value: "maxevo-jwt-secret-2024-production-deployment-secure-key-change-this"
-        type: SECRET
-      - key: JWT_REFRESH_SECRET  
-        value: "maxevo-refresh-secret-2024-production-deployment-secure-key-change-this"
-        type: SECRET
-      - key: CREDS_KEY
-        value: "maxevo-creds-key-2024-secure-32-char"
-        type: SECRET  
-      - key: CREDS_IV
-        value: "maxevo-iv-16-char"
-        type: SECRET
-      
-      # Session settings
-      - key: SESSION_EXPIRY
-        value: "900000"
-      - key: REFRESH_TOKEN_EXPIRY
-        value: "604800000"
-      
-      # Registration settings
-      - key: ALLOW_REGISTRATION
-        value: "true"
-      - key: ALLOW_SOCIAL_LOGIN
-        value: "false"
-      - key: ALLOW_SOCIAL_REGISTRATION
-        value: "false"
-      
-      # MaxEvo system configuration
+      # MaxEvo configuration
       - key: MAXEVO_ENABLED
         value: "true"
-      - key: MAXEVO_MEMORY_LIMIT
-        value: "1000"
-      - key: MAXEVO_TASK_TIMEOUT
-        value: "300000"
-      - key: MAXEVO_RESURRECTION_ENABLED
+      - key: MAXEVO_UI_MODE
         value: "true"
-      - key: MAXEVO_TERMINAL_ENABLED
-        value: "true"
-      - key: MAXEVO_MULTIAGENT_ENABLED
-        value: "true"
-      - key: MAXEVO_FAILSAFE_MODE
-        value: "true"
-      - key: MAXEVO_MOCK_AGENTS
-        value: "true"
-      - key: MAXEVO_STANDALONE_MODE
+      - key: MAXEVO_STANDALONE
         value: "true"
       
-      # MCP settings
-      - key: MCP_ENABLED
-        value: "true"
-      - key: MCP_HOST
-        value: "localhost"
-      - key: MCP_PORT
-        value: "3001"
-      
-      # Logging settings
+      # Logging
       - key: LOG_LEVEL
         value: "info"
       - key: CONSOLE_JSON
         value: "true"
-      - key: DEBUG_LOGGING
-        value: "false"
-      - key: DEBUG_CONSOLE
-        value: "false"
-      
-      # Performance settings
-      - key: NODE_OPTIONS
-        value: "--max-old-space-size=512"
-      - key: DISABLE_COMPRESSION
-        value: "false"
-      
-      # File handling
-      - key: FILE_UPLOAD_PATH
-        value: "/tmp/uploads"
-      - key: CDN_PROVIDER
-        value: "local"
-      
-      # WebSocket settings
-      - key: WEBSOCKET_ENABLED
-        value: "true"
-      - key: WEBSOCKET_PATH
-        value: "/maxevo-ws"
-      - key: WEBSOCKET_PING_INTERVAL
-        value: "30000"
-      - key: WEBSOCKET_PONG_TIMEOUT
-        value: "60000"
-      
-      # Search settings (disabled for basic deployment)
-      - key: SEARCH
-        value: "false"
-      - key: MEILI_HOST
-        value: "http://localhost:7700"
-      
-      # Rate limiting
-      - key: LIMIT_CONCURRENT_MESSAGES
-        value: "false" 
-      - key: LIMIT_MESSAGE_IP
-        value: "false"
-      - key: MESSAGE_IP_MAX
-        value: "40"
-      - key: MESSAGE_IP_WINDOW
-        value: "1"
-      - key: MESSAGE_USER_MAX
-        value: "40"
-      - key: MESSAGE_USER_WINDOW
-        value: "1"
-      
-      # Email settings (disabled by default)
-      - key: EMAIL_ENABLED
-        value: "false"
-      - key: EMAIL_FROM
-        value: "noreply@maxevo.ai"
-      
-      # Development overrides (disabled for production)
-      - key: VITE_SHOW_STAFFTOOLS
-        value: "false"
-      - key: VITE_SHOW_BETA_FEATURES
-        value: "false"
-      
-      # Error handling
-      - key: GRACEFUL_SHUTDOWN_TIMEOUT
-        value: "30000"
-      - key: UNCAUGHT_EXCEPTION_HANDLER
-        value: "true"
-      - key: UNHANDLED_REJECTION_HANDLER
-        value: "true"
-      
-      # CORS settings
-      - key: CORS_ORIGIN
-        value: "true"
-      - key: CORS_CREDENTIALS
-        value: "true"
-      
-      # Cache settings
-      - key: CACHE_CONTROL
-        value: "no-cache"
-      - key: INDEX_CACHE_CONTROL
-        value: "no-cache, no-store, must-revalidate"
-      - key: INDEX_PRAGMA
-        value: "no-cache"
-      - key: INDEX_EXPIRES
-        value: "0"
-      
-      # MaxEvo backup settings
-      - key: MAXEVO_BACKUP_ENABLED
-        value: "true"
-      - key: MAXEVO_BACKUP_INTERVAL
-        value: "3600000"
-      - key: MAXEVO_STATE_PERSISTENCE
-        value: "true"
-      
-      # Optional API keys (leave empty for fallback mode)
-      - key: CLAUDE_API_KEY
-        value: ""
-        type: SECRET
-      - key: OPENAI_API_KEY
-        value: ""
-        type: SECRET
-      - key: ANTHROPIC_API_KEY
-        value: ""
-        type: SECRET
-      
-      # Model settings
-      - key: GPT4_MODEL
-        value: "gpt-4o-mini"
-      - key: GPT35_MODEL
-        value: "gpt-3.5-turbo"
-      - key: ANTHROPIC_MODELS
-        value: "claude-3-sonnet-20240229,claude-3-haiku-20240307"
-
-# Minimal deployment - focus on main app service only
-# Additional services can be added after successful deployment

@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ChatGPT-style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth animations */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom message styling */
+.message-content {
+  @apply leading-relaxed;
+}
+
+.message-content p {
+  @apply mb-2 last:mb-0;
+}
+
+.message-content pre {
+  @apply bg-gray-800 rounded-lg p-4 overflow-x-auto my-2;
+}
+
+.message-content code {
+  @apply bg-gray-800 px-1 py-0.5 rounded text-sm;
+}
+
+.message-content ul, .message-content ol {
+  @apply ml-4 mb-2;
+}
+
+.message-content li {
+  @apply mb-1;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Status indicators */
+.status-indicator {
+  @apply inline-flex items-center gap-1 text-sm;
+}
+
+.status-running {
+  @apply text-yellow-400;
+}
+
+.status-success {
+  @apply text-green-400;
+}
+
+.status-error {
+  @apply text-red-400;
+}
+
+/* Agent badges */
+.agent-badge {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.agent-claude {
+  @apply bg-orange-900/30 text-orange-300 border border-orange-500/30;
+}
+
+.agent-gpt {
+  @apply bg-blue-900/30 text-blue-300 border border-blue-500/30;
+}
+
+.agent-maxevo {
+  @apply bg-purple-900/30 text-purple-300 border border-purple-500/30;
+}
