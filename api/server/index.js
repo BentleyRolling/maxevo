@@ -2,6 +2,25 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 require('module-alias')({ base: path.resolve(__dirname, '..') });
+
+// Initialize safe console fallback for production deployments
+const safeConsole = {
+  info: (...args) => console.info(...args),
+  warn: (...args) => console.warn(...args),
+  error: (...args) => console.error(...args),
+  debug: (...args) => console.debug(...args)
+};
+
+// Initialize logger with fallback
+let logger;
+try {
+  const { logger: librechatLogger } = require('@librechat/data-schemas');
+  logger = librechatLogger || safeConsole;
+} catch (error) {
+  console.warn('⚠️ LibreChat logger initialization failed, using console fallback:', error.message);
+  logger = safeConsole;
+}
+
 const cors = require('cors');
 const axios = require('axios');
 const express = require('express');
@@ -9,7 +28,6 @@ const passport = require('passport');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const { isEnabled } = require('@librechat/api');
-const { logger } = require('@librechat/data-schemas');
 const mongoSanitize = require('express-mongo-sanitize');
 const { connectDb, indexSync } = require('~/db');
 
@@ -175,65 +193,55 @@ const startServer = async () => {
 startServer();
 
 let messageCount = 0;
+
+// Enhanced uncaught exception handler for production deployment
 process.on('uncaughtException', (err) => {
-  // Ensure logger exists before using it
-  const safeLogger = logger || console;
-  const logError = safeLogger.error || console.error;
-  const logWarn = safeLogger.warn || console.warn;
+  // Use safe console logging to prevent logger initialization issues
+  console.error('🚨 UNCAUGHT EXCEPTION:', err.message);
+  console.error('📍 Stack:', err.stack);
   
-  if (!err.message.includes('fetch failed')) {
+  // Try to use logger if available, but don't fail if it's not
+  if (logger && typeof logger.error === 'function') {
     try {
-      logError('There was an uncaught error:', err);
+      logger.error('There was an uncaught error:', err);
     } catch (loggerError) {
-      console.error('There was an uncaught error:', err);
-      console.error('Logger also failed:', loggerError);
+      console.error('Logger failed during error handling:', loggerError.message);
     }
   }
-
+  
+  // Handle specific non-fatal errors that shouldn't crash the server
   if (err.message.includes('abort')) {
-    try {
-      logWarn('There was an uncatchable AbortController error.');
-    } catch (e) {
-      console.warn('There was an uncatchable AbortController error.');
-    }
+    console.warn('⚠️ AbortController error (non-fatal):', err.message);
     return;
   }
 
   if (err.message.includes('GoogleGenerativeAI')) {
-    try {
-      logWarn(
-        '\n\n`GoogleGenerativeAI` errors cannot be caught due to an upstream issue, see: https://github.com/google-gemini/generative-ai-js/issues/303',
-      );
-    } catch (e) {
-      console.warn('GoogleGenerativeAI error occurred');
-    }
+    console.warn('⚠️ GoogleGenerativeAI error (non-fatal):', err.message);
     return;
   }
 
   if (err.message.includes('fetch failed')) {
     if (messageCount === 0) {
-      try {
-        logWarn('Meilisearch error, search will be disabled');
-      } catch (e) {
-        console.warn('Meilisearch error, search will be disabled');
-      }
+      console.warn('⚠️ Meilisearch error, search will be disabled');
       messageCount++;
     }
-
     return;
   }
 
   if (err.message.includes('OpenAIError') || err.message.includes('ChatCompletionMessage')) {
-    try {
-      logError(
-        '\n\nAn Uncaught `OpenAIError` error may be due to your reverse-proxy setup or stream configuration, or a bug in the `openai` node package.',
-      );
-    } catch (e) {
-      console.error('OpenAI error occurred');
-    }
+    console.error('⚠️ OpenAI error (non-fatal):', err.message);
     return;
   }
 
+  // For production deployment, try to continue instead of crashing
+  if (process.env.NODE_ENV === 'production') {
+    console.error('🔥 PRODUCTION: Attempting to continue despite uncaught exception');
+    console.error('📊 Memory usage:', process.memoryUsage());
+    return; // Don't exit in production
+  }
+
+  // Only exit in development
+  console.error('💥 DEVELOPMENT: Exiting due to uncaught exception');
   process.exit(1);
 });
 

@@ -48,10 +48,8 @@ services:
       echo "Environment: $NODE_ENV"
       echo "Port: $PORT"
       echo "Host: $HOST"
-      cd api
-      echo "Starting server from: $(pwd)"
-      echo "Server file exists: $(test -f server/index.js && echo 'YES' || echo 'NO')"
-      node server/index.js
+      echo "Using production startup script to avoid port conflicts..."
+      node start-production.js
     
     environment_slug: node-js
     instance_count: 1
