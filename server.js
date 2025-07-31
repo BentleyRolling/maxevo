@@ -4,11 +4,55 @@ const WebSocket = require('ws')
 const http = require('http')
 const path = require('path')
 
-// Import our existing MaxEvo services
-const MaxEvoCore = require('../api/server/services/MaxEvoCore')
-const MaxEvoAgentRouter = require('../api/server/services/MaxEvoAgentRouter')
-const MaxEvoScheduler = require('../api/server/services/MaxEvoScheduler')
-const { getTaskRunner } = require('../api/server/services/task-runner')
+// Mock MaxEvo services for standalone deployment
+class MockMaxEvoCore {
+  async initialize() {
+    console.log('✅ Mock MaxEvo Core initialized')
+  }
+}
+
+class MockMaxEvoAgentRouter {
+  constructor(core) {
+    this.core = core
+  }
+  
+  async initialize() {
+    console.log('✅ Mock Agent Router initialized')
+  }
+  
+  async routeTask(task) {
+    // Simulate agent routing with fallback responses
+    return {
+      response: this.generateResponse(task.content),
+      agent: 'MaxEvo',
+      taskId: 'mock-task-' + Date.now()
+    }
+  }
+  
+  generateResponse(message) {
+    const responses = [
+      `🤖 **MaxEvo AI Processing**: ${message.slice(0, 50)}...\n\nI understand your request and I'm working on it. In a full deployment, I would coordinate with multiple AI agents to provide the best response.`,
+      `✨ **Task Routed Successfully**: Your request has been analyzed and distributed to the appropriate systems. This is a demo response showing the MaxEvo UI interface.`,
+      `🚀 **MaxEvo Response**: I'm ready to help with complex tasks involving multiple agents, automation, and intelligent routing. This demo shows the ChatGPT-style interface.`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
+}
+
+class MockMaxEvoScheduler {
+  async initialize() {
+    console.log('✅ Mock Scheduler initialized')
+  }
+}
+
+const MockTaskRunner = {
+  async getTaskRunner() {
+    return {
+      status: 'mock-ready',
+      execute: () => console.log('Mock task executed')
+    }
+  }
+}
 
 const app = express()
 const server = http.createServer(app)
@@ -42,35 +86,32 @@ async function initializeMaxEvo() {
   try {
     console.log('🚀 Initializing MaxEvo system...')
     
-    // Initialize core components with error handling
+    // Initialize mock components for standalone deployment
     try {
-      maxevoCore = new MaxEvoCore()
+      maxevoCore = new MockMaxEvoCore()
       await maxevoCore.initialize()
-      console.log('✅ MaxEvo Core initialized')
     } catch (error) {
       console.warn('⚠️ MaxEvo Core initialization failed:', error.message)
     }
     
     if (maxevoCore) {
       try {
-        agentRouter = new MaxEvoAgentRouter(maxevoCore)
+        agentRouter = new MockMaxEvoAgentRouter(maxevoCore)
         await agentRouter.initialize()
-        console.log('✅ Agent Router initialized')
       } catch (error) {
         console.warn('⚠️ Agent Router initialization failed:', error.message)
       }
       
       try {
-        scheduler = new MaxEvoScheduler()
+        scheduler = new MockMaxEvoScheduler()
         await scheduler.initialize()
-        console.log('✅ Scheduler initialized')
       } catch (error) {
         console.warn('⚠️ Scheduler initialization failed:', error.message)
       }
     }
     
     try {
-      taskRunner = await getTaskRunner()
+      taskRunner = await MockTaskRunner.getTaskRunner()
       console.log('✅ Task Runner initialized')
     } catch (error) {
       console.warn('⚠️ Task Runner initialization failed:', error.message)
