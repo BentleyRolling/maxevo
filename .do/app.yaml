@@ -17,13 +17,17 @@ services:
       echo "Node version: $(node --version)"
       echo "NPM version: $(npm --version)"
       
-      # Install dependencies
-      npm ci --only=production --no-audit --no-fund
+      # Install ALL dependencies (including devDependencies for Vite build)
+      npm ci --no-audit --no-fund
       echo "✅ Dependencies installed"
       
-      # Build frontend
+      # Build frontend with Vite
       npm run build
       echo "✅ Frontend built"
+      
+      # Install only production dependencies for runtime
+      npm prune --production
+      echo "✅ Production dependencies pruned"
       
       # Verify build
       echo "Build verification:"
