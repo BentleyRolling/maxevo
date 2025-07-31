@@ -1,0 +1,32 @@
+{
+  "name": "maxevo-ui",
+  "version": "1.0.0",
+  "description": "MaxEvo AI Orchestration System - ChatGPT-style Interface",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.1",
+    "zustand": "^4.3.6",
+    "lucide-react": "^0.263.1",
+    "react-markdown": "^8.0.7",
+    "remark-gfm": "^3.0.1",
+    "express": "^4.18.2",
+    "ws": "^8.13.0",
+    "cors": "^2.8.5",
+    "node-cron": "^3.0.2",
+    "axios": "^1.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.3.2",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.23"
+  }
+}

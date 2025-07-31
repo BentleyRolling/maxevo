@@ -1,0 +1,80 @@
+# MaxEvo UI - DigitalOcean App Platform Configuration
+# Clean, simple deployment for MaxEvo AI Orchestration System
+
+name: maxevo-ui
+region: nyc
+
+services:
+  - name: maxevo-ui
+    source_dir: /maxevo-ui
+    github:
+      repo: BentleyRolling/maxevo
+      branch: main
+      deploy_on_push: true
+    
+    # Build configuration
+    build_command: |
+      echo "🚀 Building MaxEvo UI..."
+      echo "Node version: $(node --version)"
+      echo "NPM version: $(npm --version)"
+      
+      # Install dependencies
+      npm ci --only=production --no-audit --no-fund
+      echo "✅ Dependencies installed"
+      
+      # Build frontend
+      npm run build
+      echo "✅ Frontend built"
+      
+      # Verify build
+      echo "Build verification:"
+      echo "Server exists: $(test -f server.js && echo 'YES' || echo 'NO')"
+      echo "Frontend dist exists: $(test -d dist && echo 'YES' || echo 'NO')"
+      echo "✅ MaxEvo UI build completed successfully"
+    
+    # Runtime configuration
+    run_command: |
+      echo "🌟 Starting MaxEvo UI..."
+      echo "Environment: $NODE_ENV"
+      echo "Port: $PORT"
+      node server.js
+    
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    # Health check configuration
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 15
+      timeout_seconds: 10
+      failure_threshold: 3
+      success_threshold: 2
+    
+    # HTTP configuration
+    http_port: 8080
+    
+    # Environment variables
+    envs:
+      # Core settings
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: HOST
+        value: "0.0.0.0"
+      
+      # MaxEvo configuration
+      - key: MAXEVO_ENABLED
+        value: "true"
+      - key: MAXEVO_UI_MODE
+        value: "true"
+      - key: MAXEVO_STANDALONE
+        value: "true"
+      
+      # Logging
+      - key: LOG_LEVEL
+        value: "info"
+      - key: CONSOLE_JSON
+        value: "true"
