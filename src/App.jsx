@@ -6,7 +6,7 @@ import { useMaxEvoStore } from './store/maxevoStore'
 function App() {
   return (
     <Router>
-      <div className="flex h-screen bg-white text-gray-900 antialiased">
+      <div className="flex h-screen bg-[#212121] text-white antialiased">
         <Routes>
           <Route path="/" element={<ChatInterface />} />
           <Route path="/chat/:chatId" element={<ChatInterface />} />

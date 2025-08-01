@@ -51,12 +51,20 @@ const Sidebar = () => {
   }
   
   return (
-    <div className="h-full bg-gray-900 text-white flex flex-col">
-      {/* Header */}
+    <div className="h-full bg-[#181818] text-white flex flex-col">
+      {/* Header with MaxEvo Branding */}
       <div className="p-3 border-b border-gray-700">
+        {/* MaxEvo Logo */}
+        <div className="flex items-center gap-3 px-3 py-2 mb-3">
+          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+            <span className="text-black font-bold text-sm">M</span>
+          </div>
+          <span className="font-semibold text-lg">MaxEvo</span>
+        </div>
+        
         <button 
           onClick={handleNewChat}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-gray-800 rounded-md transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
         >
           <Plus className="w-4 h-4" />
           New chat
@@ -74,8 +82,8 @@ const Sidebar = () => {
               onClick={() => handleChatSelect(chatId)}
               className={`group relative flex items-center gap-3 px-3 py-2.5 text-sm rounded-md cursor-pointer transition-colors ${
                 currentChatId === chatId 
-                  ? 'bg-gray-800 text-white' 
-                  : 'text-gray-300 hover:bg-gray-800'
+                  ? 'bg-gray-700 text-white' 
+                  : 'text-gray-300 hover:bg-gray-700'
               }`}
             >
               <MessageSquare className="w-4 h-4 flex-shrink-0" />
@@ -120,11 +128,11 @@ const Sidebar = () => {
       
       {/* Footer */}
       <div className="border-t border-gray-700 p-3">
-        <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer transition-colors">
+        <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
           <User className="w-4 h-4" />
           <span>Account</span>
         </div>
-        <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-md cursor-pointer transition-colors">
+        <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-md cursor-pointer transition-colors">
           <Settings className="w-4 h-4" />
           <span>Settings</span>
         </div>
