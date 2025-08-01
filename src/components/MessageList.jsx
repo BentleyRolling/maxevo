@@ -21,8 +21,8 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
         <div key={index} className="group">
           <div className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {message.role === 'assistant' && (
-              <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-black font-bold text-sm">M</span>
+              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center">
+                <img src="/maxevo-logo.png" alt="MaxEvo" className="w-8 h-8" />
               </div>
             )}
             
@@ -42,7 +42,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
               {/* Message Content */}
               <div className={`prose prose-sm max-w-none ${
                 message.role === 'user' 
-                  ? 'bg-[#2a2a2a] border border-gray-600 rounded-2xl px-4 py-3 ml-auto' 
+                  ? 'bg-[#2a2a2a] rounded-2xl px-4 py-3 ml-auto' 
                   : 'text-white'
               }`}>
                 {message.role === 'user' ? (
@@ -108,8 +108,8 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
       {isTyping && (
         <div className="group">
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <span className="text-black font-bold text-sm">M</span>
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center">
+              <img src="/maxevo-logo.png" alt="MaxEvo" className="w-8 h-8" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">

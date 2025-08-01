@@ -112,7 +112,7 @@ const ChatInterface = () => {
       {/* Main Chat Area - Full width like ChatGPT */}
       <div className="flex flex-col flex-1 bg-[#212121]">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-600">
+        <div className="flex items-center justify-between px-4 py-3">
           <ChatHeader />
         </div>
         
@@ -122,8 +122,8 @@ const ChatInterface = () => {
             // Welcome screen
             <div className="flex flex-col items-center justify-center h-full py-20 text-center max-w-3xl mx-auto px-4">
               <div className="mb-8">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-black font-bold text-lg">M</span>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <img src="/maxevo-logo.png" alt="MaxEvo" className="w-16 h-16" />
                 </div>
                 <h1 className="text-2xl font-semibold text-white mb-2">How can I help you today?</h1>
                 <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
@@ -133,28 +133,28 @@ const ChatInterface = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
                 <button 
                   onClick={() => handleSendMessage("Write a blog post about AI automation")}
-                  className="p-4 text-left border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
                 >
                   <div className="font-medium text-white mb-1">✍️ Create content</div>
                   <div className="text-sm text-gray-400">Write blog posts, articles, and marketing copy</div>
                 </button>
                 <button 
                   onClick={() => handleSendMessage("Analyze my business data and create insights")}
-                  className="p-4 text-left border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
                 >
                   <div className="font-medium text-white mb-1">📊 Analyze data</div>
                   <div className="text-sm text-gray-400">Get insights from your business metrics</div>
                 </button>
                 <button 
                   onClick={() => handleSendMessage("Create an automated workflow for customer support")}
-                  className="p-4 text-left border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
                 >
                   <div className="font-medium text-white mb-1">⚡ Automate tasks</div>
                   <div className="text-sm text-gray-400">Set up workflows and automated processes</div>
                 </button>
                 <button 
                   onClick={() => handleSendMessage("Help me optimize my website for better conversions")}
-                  className="p-4 text-left border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
                 >
                   <div className="font-medium text-white mb-1">🚀 Optimize business</div>
                   <div className="text-sm text-gray-400">Improve performance and growth metrics</div>
@@ -175,7 +175,7 @@ const ChatInterface = () => {
         </div>
         
         {/* Input Area - Full width with proper centering */}
-        <div className="border-t border-gray-600 bg-[#212121]">
+        <div className="bg-[#212121]">
           <div className="max-w-4xl mx-auto px-4 py-4">
             <ChatInput 
               onSendMessage={handleSendMessage}
