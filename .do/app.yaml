@@ -23,17 +23,22 @@ services:
       
       # Build frontend with Vite
       echo "🔨 Starting Vite build..."
+      echo "Working directory: $(pwd)"
+      echo "Files in directory: $(ls -la)"
+      echo "Node modules exists: $(test -d node_modules && echo 'YES' || echo 'NO')"
+      
       npm run build 2>&1 || { echo "❌ Build failed"; exit 1; }
       echo "✅ Frontend built successfully"
+      
+      # Verify build BEFORE pruning
+      echo "Build verification:"
+      echo "Server exists: $(test -f server.js && echo 'YES' || echo 'NO')"
+      echo "Frontend dist exists: $(test -d dist && echo 'YES' || echo 'NO')"
+      echo "Dist contents: $(ls -la dist/ 2>/dev/null || echo 'NONE')"
       
       # Install only production dependencies for runtime
       npm prune --production
       echo "✅ Production dependencies pruned"
-      
-      # Verify build
-      echo "Build verification:"
-      echo "Server exists: $(test -f server.js && echo 'YES' || echo 'NO')"
-      echo "Frontend dist exists: $(test -d dist && echo 'YES' || echo 'NO')"
       echo "✅ MaxEvo UI build completed successfully"
     
     # Runtime configuration
