@@ -119,7 +119,7 @@ const ChatInterface = () => {
         {/* Chat Content - SHARED CONTAINER CONSTRAINT STRATEGY */}
         <div className="flex-1 flex flex-col min-h-0 relative">
           {/* Shared Container - This sets the width for BOTH messages and input */}
-          <div className="max-w-4xl mx-auto w-full h-full relative">
+          <div className="max-w-3xl mx-auto w-full h-full relative">
             
             {/* Messages Area */}
             <div 
