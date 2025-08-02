@@ -103,25 +103,25 @@ const ChatInterface = () => {
   const currentMessages = currentChatId ? messages[currentChatId] || [] : []
   
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen w-full">
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'w-60' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717] flex-shrink-0`}>
         <Sidebar />
       </div>
       
-      {/* Main Chat Area */}
-      <div className="flex flex-col flex-1 bg-[#212121] min-w-0">
+      {/* Main Chat Area - FULL REMAINING WIDTH */}
+      <div className="flex-1 flex flex-col bg-[#212121]">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
           <ChatHeader />
         </div>
         
-        {/* Chat Container - FULL WIDTH */}
-        <div className="flex-1 flex flex-col min-h-0 w-full">
+        {/* Chat Content - FULL WIDTH */}
+        <div className="flex-1 flex flex-col">
           {currentMessages.length === 0 ? (
-            // Welcome screen - FULL WIDTH with centered content
-            <div className="flex-1 flex flex-col justify-center w-full px-6">
-              <div className="max-w-3xl mx-auto text-center w-full">
+            // Welcome screen
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
                 <div className="mb-8">
                   <div className="flex items-center justify-center mb-4">
                     <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
@@ -130,8 +130,8 @@ const ChatInterface = () => {
                   <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
                 </div>
                 
-                {/* Quick Actions - Proper ChatGPT sizing */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                   <button 
                     onClick={() => handleSendMessage("Write a blog post about AI automation")}
                     className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
@@ -164,24 +164,26 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            // Messages Area - FULL WIDTH with centered content
-            <div className="flex-1 overflow-hidden flex flex-col w-full">
-              <div className="flex-1 overflow-y-auto flex flex-col justify-end w-full">
-                <div className="max-w-3xl mx-auto px-6 py-4">
-                  <MessageList 
-                    messages={currentMessages}
-                    isTyping={isTyping}
-                    activeAgent={activeAgent}
-                    agentStatus={agentStatus}
-                  />
-                  <div ref={messagesEndRef} />
+            // Chat Messages
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 overflow-y-auto">
+                <div className="min-h-full flex flex-col justify-end">
+                  <div className="max-w-3xl mx-auto w-full px-6 py-4">
+                    <MessageList 
+                      messages={currentMessages}
+                      isTyping={isTyping}
+                      activeAgent={activeAgent}
+                      agentStatus={agentStatus}
+                    />
+                    <div ref={messagesEndRef} />
+                  </div>
                 </div>
               </div>
             </div>
           )}
           
-          {/* Input Area - FULL WIDTH with centered content */}
-          <div className="flex-shrink-0 bg-[#212121] border-t border-gray-700 w-full">
+          {/* Input Area */}
+          <div className="border-t border-gray-700 bg-[#212121]">
             <div className="max-w-3xl mx-auto px-6 py-4">
               <ChatInput 
                 onSendMessage={handleSendMessage}
