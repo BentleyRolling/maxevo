@@ -120,8 +120,8 @@ const ChatInterface = () => {
         <div className="flex-1 flex flex-col min-h-0">
           {currentMessages.length === 0 ? (
             // Welcome screen
-            <div className="flex-1 flex flex-col items-center justify-center px-4">
-              <div className="text-center">
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div className="w-full max-w-3xl text-center">
                 <div className="mb-8">
                   <div className="flex items-center justify-center mb-4">
                     <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
@@ -130,8 +130,8 @@ const ChatInterface = () => {
                   <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
                 </div>
                 
-                {/* Quick Actions - Compact like ChatGPT */}
-                <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto">
+                {/* Quick Actions - Proper ChatGPT sizing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
                   <button 
                     onClick={() => handleSendMessage("Write a blog post about AI automation")}
                     className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
@@ -167,7 +167,7 @@ const ChatInterface = () => {
             // Messages Area - Proper flex layout
             <div className="flex-1 overflow-hidden flex flex-col">
               <div className="flex-1 overflow-y-auto flex flex-col justify-end">
-                <div className="max-w-2xl mx-auto px-4 py-4 w-full">
+                <div className="max-w-3xl mx-auto px-6 py-4 w-full">
                   <MessageList 
                     messages={currentMessages}
                     isTyping={isTyping}
@@ -182,7 +182,7 @@ const ChatInterface = () => {
           
           {/* Input Area - Fixed at bottom */}
           <div className="flex-shrink-0 bg-[#212121] border-t border-gray-700">
-            <div className="max-w-2xl mx-auto px-4 py-4">
+            <div className="max-w-3xl mx-auto px-6 py-4">
               <ChatInput 
                 onSendMessage={handleSendMessage}
                 disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
