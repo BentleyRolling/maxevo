@@ -33,55 +33,68 @@ const ChatInput = ({ onSendMessage, disabled, placeholder = 'Message MaxEvo...' 
   
   return (
     <div className="w-full">
-      {/* Input Container - TRANSPARENT CHATGPT STYLE */} 
+      {/* ChatGPT Two-Row Layout */} 
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex min-h-[60px] items-end rounded-3xl bg-[#2f2f2f] focus-within:bg-[#404040] transition-colors border border-[#565656] shadow-lg">
-          {/* Attach Button */}
-          <button
-            type="button"
-            className="absolute left-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-300 transition-colors"
-            title="Attach files"
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
+        <div className="rounded-3xl bg-[#2f2f2f] focus-within:bg-[#404040] transition-colors border border-[#565656] shadow-lg">
           
-          {/* Textarea */}
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            disabled={disabled}
-            className="flex-1 resize-none bg-transparent px-12 py-3 text-white placeholder-gray-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-            rows={1}
-            style={{ minHeight: '60px', maxHeight: '200px' }}
-          />
+          {/* Top Row - Text Input */}
+          <div className="px-4 pt-4 pb-2">
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={disabled}
+              className="w-full resize-none bg-transparent text-white placeholder-gray-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed text-base leading-6"
+              rows={1}
+              style={{ minHeight: '24px', maxHeight: '200px' }}
+            />
+          </div>
           
-          {/* Send Button */}
-          <button
-            type="submit"
-            disabled={!message.trim() || disabled}
-            className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
-              message.trim() && !disabled
-                ? 'bg-white text-black hover:bg-gray-200 shadow-sm'
-                : 'text-gray-500 cursor-not-allowed'
-            }`}
-            title={disabled ? 'AI is thinking...' : 'Send message'}
-          >
-            {disabled ? (
-              <Square className="w-4 h-4" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-          </button>
+          {/* Bottom Row - Tools and Send Button */}
+          <div className="flex items-center justify-between px-4 pb-4">
+            <div className="flex items-center gap-2">
+              {/* Attach Button */}
+              <button
+                type="button"
+                className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-600 rounded-lg transition-colors"
+                title="Attach files"
+              >
+                <Paperclip className="w-5 h-5" />
+              </button>
+              
+              {/* Tools Button */}
+              <button
+                type="button"
+                className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-600 rounded-lg transition-colors"
+                title="Tools"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={!message.trim() || disabled}
+              className={`p-2 rounded-lg transition-all ${
+                message.trim() && !disabled
+                  ? 'bg-white text-black hover:bg-gray-200 shadow-sm'
+                  : 'text-gray-500 cursor-not-allowed'
+              }`}
+              title={disabled ? 'AI is thinking...' : 'Send message'}
+            >
+              {disabled ? (
+                <Square className="w-4 h-4" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
       </form>
       
-      {/* Help Text */}
-      <div className="mt-2 text-xs text-gray-500 text-center">
-        MaxEvo can make mistakes. Check important info.
-      </div>
     </div>
   )
 }
