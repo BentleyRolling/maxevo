@@ -32,9 +32,9 @@ class MockMaxEvoAgentRouter {
   
   generateResponse(message) {
     const responses = [
-      `🤖 **MaxEvo AI Processing**: ${message.slice(0, 50)}...\n\nI understand your request and I'm working on it. In a full deployment, I would coordinate with multiple AI agents to provide the best response.`,
-      `✨ **Task Routed Successfully**: Your request has been analyzed and distributed to the appropriate systems. This is a demo response showing the MaxEvo UI interface.`,
-      `🚀 **MaxEvo Response**: I'm ready to help with complex tasks involving multiple agents, automation, and intelligent routing. This demo shows the ChatGPT-style interface.`
+      `I understand your request and I'm working on it. In a full deployment, I would coordinate with multiple AI agents to provide the best response.`,
+      `Your request has been analyzed and distributed to the appropriate systems. This is a demo response showing the MaxEvo UI interface.`,
+      `I'm ready to help with complex tasks involving multiple agents, automation, and intelligent routing. This demo shows the ChatGPT-style interface.`
     ]
     return responses[Math.floor(Math.random() * responses.length)]
   }
