@@ -16,7 +16,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
   }
   
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 pb-32">
       {messages.map((message, index) => (
         <div key={index} className="group">
           <div className="flex gap-4 justify-start">
@@ -31,7 +31,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
               {/* Message Content */}
               <div className="prose prose-sm max-w-none text-white">
                 {message.role === 'user' ? (
-                  <div className="bg-[#343541] rounded-2xl px-4 py-3 max-w-2xl ml-auto">
+                  <div className="bg-[#2f2f2f] rounded-xl px-4 py-3 max-w-2xl ml-auto">
                     <p className="m-0 text-white">{message.content}</p>
                   </div>
                 ) : (

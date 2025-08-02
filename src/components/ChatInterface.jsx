@@ -105,7 +105,7 @@ const ChatInterface = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar - Exact ChatGPT style */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#181818]`}>
+      <div className={`${sidebarOpen ? 'w-60' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717]`}>
         <Sidebar />
       </div>
       
@@ -117,7 +117,7 @@ const ChatInterface = () => {
         </div>
         
         {/* Messages Area - Full width with proper centering */}
-        <div className="flex-1 overflow-y-auto pb-32">
+        <div className="flex-1 overflow-y-auto">
           {currentMessages.length === 0 ? (
             // Welcome screen
             <div className="flex flex-col items-center justify-center h-full py-20 text-center max-w-3xl mx-auto px-4">
@@ -177,8 +177,8 @@ const ChatInterface = () => {
         </div>
         
         {/* Input Area - Fixed at bottom like ChatGPT */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent">
-          <div className="max-w-4xl mx-auto px-4 pt-6 pb-4">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent pointer-events-none">
+          <div className="max-w-4xl mx-auto px-6 pt-8 pb-6 pointer-events-auto">
             <ChatInput 
               onSendMessage={handleSendMessage}
               disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
