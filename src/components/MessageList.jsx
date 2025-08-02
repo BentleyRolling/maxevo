@@ -16,7 +16,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
   }
   
   return (
-    <div className="space-y-6 py-6 pb-32">
+    <div className="space-y-6 py-6 pb-32 w-full max-w-4xl mx-auto">
       {messages.map((message, index) => (
         <div key={index} className="group">
           <div className="flex gap-4 justify-start">
@@ -26,7 +26,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
               </div>
             )}
             
-            <div className="flex-1 max-w-none">
+            <div className="flex-1 max-w-none w-full">
               
               {/* Message Content */}
               <div className="prose prose-sm max-w-none text-white">

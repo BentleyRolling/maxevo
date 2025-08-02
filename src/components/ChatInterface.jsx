@@ -105,7 +105,7 @@ const ChatInterface = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar - Exact ChatGPT style */}
-      <div className={`${sidebarOpen ? 'w-60' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717]`}>
+      <div className={`${sidebarOpen ? 'w-60' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717] flex-shrink-0`}>
         <Sidebar />
       </div>
       
@@ -162,15 +162,13 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            <div className="w-full">
-              <div className="max-w-4xl mx-auto px-4">
-                <MessageList 
-                  messages={currentMessages}
-                  isTyping={isTyping}
-                  activeAgent={activeAgent}
-                  agentStatus={agentStatus}
-                />
-              </div>
+            <div className="w-full px-4">
+              <MessageList 
+                messages={currentMessages}
+                isTyping={isTyping}
+                activeAgent={activeAgent}
+                agentStatus={agentStatus}
+              />
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -178,7 +176,7 @@ const ChatInterface = () => {
         
         {/* Input Area - Fixed at bottom like ChatGPT */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent pointer-events-none">
-          <div className="max-w-4xl mx-auto px-6 pt-8 pb-6 pointer-events-auto">
+          <div className="w-full max-w-3xl mx-auto px-6 pt-8 pb-6 pointer-events-auto">
             <ChatInput 
               onSendMessage={handleSendMessage}
               disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
