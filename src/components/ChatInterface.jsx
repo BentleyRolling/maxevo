@@ -104,92 +104,97 @@ const ChatInterface = () => {
   
   return (
     <div className="flex h-screen">
-      {/* Sidebar - Exact ChatGPT style */}
+      {/* Sidebar */}
       <div className={`${sidebarOpen ? 'w-60' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717] flex-shrink-0`}>
         <Sidebar />
       </div>
       
-      {/* Main Chat Area - Full width like ChatGPT */}
-      <div className="flex flex-col flex-1 bg-[#212121] relative">
+      {/* Main Chat Area */}
+      <div className="flex flex-col flex-1 bg-[#212121] min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
           <ChatHeader />
         </div>
         
-        {/* Messages Area - Full width with proper centering */}
-        <div className="flex-1 overflow-y-auto relative pb-32">
+        {/* Chat Container - Flex layout for proper message flow */}
+        <div className="flex-1 flex flex-col min-h-0">
           {currentMessages.length === 0 ? (
             // Welcome screen
-            <div className="flex flex-col items-center justify-center h-full py-20 text-center w-full px-8">
-              <div className="mb-8">
-                <div className="flex items-center justify-center mb-4">
-                  <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
+            <div className="flex-1 flex flex-col items-center justify-center px-4">
+              <div className="max-w-3xl w-full text-center">
+                <div className="mb-8">
+                  <div className="flex items-center justify-center mb-4">
+                    <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
+                  </div>
+                  <h1 className="text-2xl font-semibold text-white mb-2">How can I help you today?</h1>
+                  <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
                 </div>
-                <h1 className="text-2xl font-semibold text-white mb-2">How can I help you today?</h1>
-                <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
-              </div>
-              
-              {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-5xl">
-                <button 
-                  onClick={() => handleSendMessage("Write a blog post about AI automation")}
-                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
-                >
-                  <div className="font-medium text-white mb-1">✍️ Create content</div>
-                  <div className="text-sm text-gray-400">Write blog posts, articles, and marketing copy</div>
-                </button>
-                <button 
-                  onClick={() => handleSendMessage("Analyze my business data and create insights")}
-                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
-                >
-                  <div className="font-medium text-white mb-1">📊 Analyze data</div>
-                  <div className="text-sm text-gray-400">Get insights from your business metrics</div>
-                </button>
-                <button 
-                  onClick={() => handleSendMessage("Create an automated workflow for customer support")}
-                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
-                >
-                  <div className="font-medium text-white mb-1">⚡ Automate tasks</div>
-                  <div className="text-sm text-gray-400">Set up workflows and automated processes</div>
-                </button>
-                <button 
-                  onClick={() => handleSendMessage("Help me optimize my website for better conversions")}
-                  className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
-                >
-                  <div className="font-medium text-white mb-1">🚀 Optimize business</div>
-                  <div className="text-sm text-gray-400">Improve performance and growth metrics</div>
-                </button>
+                
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <button 
+                    onClick={() => handleSendMessage("Write a blog post about AI automation")}
+                    className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  >
+                    <div className="font-medium text-white mb-1">✍️ Create content</div>
+                    <div className="text-sm text-gray-400">Write blog posts, articles, and marketing copy</div>
+                  </button>
+                  <button 
+                    onClick={() => handleSendMessage("Analyze my business data and create insights")}
+                    className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  >
+                    <div className="font-medium text-white mb-1">📊 Analyze data</div>
+                    <div className="text-sm text-gray-400">Get insights from your business metrics</div>
+                  </button>
+                  <button 
+                    onClick={() => handleSendMessage("Create an automated workflow for customer support")}
+                    className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  >
+                    <div className="font-medium text-white mb-1">⚡ Automate tasks</div>
+                    <div className="text-sm text-gray-400">Set up workflows and automated processes</div>
+                  </button>
+                  <button 
+                    onClick={() => handleSendMessage("Help me optimize my website for better conversions")}
+                    className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
+                  >
+                    <div className="font-medium text-white mb-1">🚀 Optimize business</div>
+                    <div className="text-sm text-gray-400">Improve performance and growth metrics</div>
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="absolute bottom-0 left-0 right-0 pb-32">
-              <div className="w-full max-w-3xl mx-auto px-6">
-                <MessageList 
-                  messages={currentMessages}
-                  isTyping={isTyping}
-                  activeAgent={activeAgent}
-                  agentStatus={agentStatus}
-                />
+            // Messages Area - Proper flex layout
+            <div className="flex-1 overflow-hidden flex flex-col">
+              <div className="flex-1 overflow-y-auto">
+                <div className="max-w-3xl mx-auto px-4 py-4">
+                  <MessageList 
+                    messages={currentMessages}
+                    isTyping={isTyping}
+                    activeAgent={activeAgent}
+                    agentStatus={agentStatus}
+                  />
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
-              <div ref={messagesEndRef} />
             </div>
           )}
-        </div>
-        
-        {/* Input Area - Fixed at bottom like ChatGPT */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent pointer-events-none">
-          <div className="w-full max-w-3xl mx-auto px-6 pt-8 pb-6 pointer-events-auto">
-            <ChatInput 
-              onSendMessage={handleSendMessage}
-              disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
-              placeholder={
-                agentStatus === 'thinking' 
-                  ? `${activeAgent} is thinking...`
-                  : agentStatus === 'executing'
-                  ? `${activeAgent} is executing...`
-                  : 'Message MaxEvo...'
-              }
-            />
+          
+          {/* Input Area - Fixed at bottom */}
+          <div className="flex-shrink-0 bg-[#212121] border-t border-gray-700">
+            <div className="max-w-3xl mx-auto px-4 py-4">
+              <ChatInput 
+                onSendMessage={handleSendMessage}
+                disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
+                placeholder={
+                  agentStatus === 'thinking' 
+                    ? `${activeAgent} is thinking...`
+                    : agentStatus === 'executing'
+                    ? `${activeAgent} is executing...`
+                    : 'Message MaxEvo...'
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
