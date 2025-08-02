@@ -120,17 +120,17 @@ const ChatInterface = () => {
         <div className="flex-1 overflow-y-auto">
           {currentMessages.length === 0 ? (
             // Welcome screen
-            <div className="flex flex-col items-center justify-center h-full py-20 text-center max-w-3xl mx-auto px-4">
+            <div className="flex flex-col items-center justify-center h-full py-20 text-center w-full px-8">
               <div className="mb-8">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-                  <img src="/maxevo-logo.png" alt="MaxEvo" className="w-16 h-16" />
+                <div className="flex items-center justify-center mb-4">
+                  <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
                 </div>
                 <h1 className="text-2xl font-semibold text-white mb-2">How can I help you today?</h1>
                 <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
               </div>
               
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-5xl">
                 <button 
                   onClick={() => handleSendMessage("Write a blog post about AI automation")}
                   className="p-4 text-left rounded-lg hover:bg-gray-700 transition-colors bg-[#2a2a2a]"
