@@ -35,7 +35,7 @@ const ChatInput = ({ onSendMessage, disabled, placeholder = 'Message MaxEvo...' 
     <div className="w-full">
       {/* Input Container */} 
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex min-h-[52px] items-end rounded-2xl bg-[#303030] focus-within:bg-[#2a2a2a] transition-colors">
+        <div className="relative flex min-h-[60px] items-end rounded-3xl bg-[#2f2f2f] focus-within:bg-[#404040] transition-colors border border-[#565656]">
           {/* Attach Button */}
           <button
             type="button"
@@ -55,7 +55,7 @@ const ChatInput = ({ onSendMessage, disabled, placeholder = 'Message MaxEvo...' 
             disabled={disabled}
             className="flex-1 resize-none bg-transparent px-12 py-3 text-white placeholder-gray-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             rows={1}
-            style={{ minHeight: '52px', maxHeight: '200px' }}
+            style={{ minHeight: '60px', maxHeight: '200px' }}
           />
           
           {/* Send Button */}

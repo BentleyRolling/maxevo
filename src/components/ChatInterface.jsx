@@ -164,16 +164,17 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            // Messages - PERFECT SCROLL CONTAINMENT
-            <div className="flex-1 min-h-0 overflow-hidden">
+            // Messages - SCROLL BEHIND INPUT LIKE CHATGPT
+            <div className="flex-1 min-h-0 relative">
               <div 
-                className="h-full overflow-y-auto px-6"
+                className="absolute inset-0 overflow-y-auto px-6"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   contain: 'layout style',
                   willChange: 'scroll-position',
-                  overscrollBehavior: 'contain'
+                  overscrollBehavior: 'contain',
+                  paddingBottom: '120px' // Space for input area
                 }}
               >
                 <style jsx>{`
@@ -195,25 +196,25 @@ const ChatInterface = () => {
                   <div ref={messagesEndRef} />
                 </div>
               </div>
+              
+              {/* Input Area - FIXED AT BOTTOM */}
+              <div className="absolute bottom-0 left-0 right-0 bg-[#212121] bg-gradient-to-t from-[#212121] via-[#212121] to-transparent pt-6">
+                <div className="max-w-3xl mx-auto px-6 pb-6">
+                  <ChatInput 
+                    onSendMessage={handleSendMessage}
+                    disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
+                    placeholder={
+                      agentStatus === 'thinking' 
+                        ? `${activeAgent} is thinking...`
+                        : agentStatus === 'executing'
+                        ? `${activeAgent} is executing...`
+                        : 'Message MaxEvo...'
+                    }
+                  />
+                </div>
+              </div>
             </div>
           )}
-          
-          {/* Input Area - NO BORDERS */}
-          <div className="bg-[#212121] flex-shrink-0">
-            <div className="max-w-3xl mx-auto px-6 py-4">
-              <ChatInput 
-                onSendMessage={handleSendMessage}
-                disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
-                placeholder={
-                  agentStatus === 'thinking' 
-                    ? `${activeAgent} is thinking...`
-                    : agentStatus === 'executing'
-                    ? `${activeAgent} is executing...`
-                    : 'Message MaxEvo...'
-                }
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

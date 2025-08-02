@@ -77,13 +77,13 @@ const Sidebar = () => {
 
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
-      {/* Header - Compact like ChatGPT */}
-      <div className="p-2">
-        <div className="flex items-center justify-between mb-2">
-          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-5 w-auto" />
+      {/* Header - ChatGPT Style with larger logo and more padding */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-8 w-auto" />
           <button 
             onClick={toggleSidebar}
-            className="p-1 hover:bg-gray-600 rounded transition-colors"
+            className="p-2 hover:bg-gray-600 rounded transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -93,7 +93,7 @@ const Sidebar = () => {
         
         <button 
           onClick={handleNewChat}
-          className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-gray-300 hover:bg-gray-600 rounded transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-gray-600 rounded transition-colors"
         >
           <Plus className="w-4 h-4" />
           New chat
@@ -101,15 +101,15 @@ const Sidebar = () => {
       </div>
       
       {/* Chat List */}
-      <div className="flex-1 overflow-y-auto px-2">
-        <div className="space-y-1">
+      <div className="flex-1 overflow-y-auto px-4">
+        <div className="space-y-2">
           {Object.entries(chats)
             .sort(([,a], [,b]) => new Date(b.createdAt) - new Date(a.createdAt))
             .map(([chatId, chat]) => (
             <div
               key={chatId}
               onClick={() => handleChatSelect(chatId)}
-              className={`group relative flex items-center gap-2 px-2 py-1.5 text-sm rounded cursor-pointer transition-colors ${
+              className={`group relative flex items-center gap-3 px-3 py-3 text-sm rounded cursor-pointer transition-colors ${
                 currentChatId === chatId 
                   ? 'bg-gray-600 text-white' 
                   : 'text-gray-300 hover:bg-gray-600'
@@ -156,12 +156,12 @@ const Sidebar = () => {
       </div>
       
       {/* Footer */}
-      <div className="p-2 border-t border-gray-600">
-        <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-300 hover:bg-gray-600 rounded cursor-pointer transition-colors">
+      <div className="p-4 border-t border-gray-600">
+        <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-gray-600 rounded cursor-pointer transition-colors">
           <User className="w-4 h-4" />
           <span>Account</span>
         </div>
-        <div className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-300 hover:bg-gray-600 rounded cursor-pointer transition-colors">
+        <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-gray-600 rounded cursor-pointer transition-colors">
           <Settings className="w-4 h-4" />
           <span>Settings</span>
         </div>
