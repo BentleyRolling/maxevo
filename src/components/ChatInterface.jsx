@@ -117,7 +117,7 @@ const ChatInterface = () => {
         </div>
         
         {/* Messages Area - Full width with proper centering */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto relative pb-32">
           {currentMessages.length === 0 ? (
             // Welcome screen
             <div className="flex flex-col items-center justify-center h-full py-20 text-center w-full px-8">
@@ -162,16 +162,18 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            <div className="w-full px-4">
-              <MessageList 
-                messages={currentMessages}
-                isTyping={isTyping}
-                activeAgent={activeAgent}
-                agentStatus={agentStatus}
-              />
+            <div className="absolute bottom-0 left-0 right-0 pb-32">
+              <div className="w-full max-w-3xl mx-auto px-6">
+                <MessageList 
+                  messages={currentMessages}
+                  isTyping={isTyping}
+                  activeAgent={activeAgent}
+                  agentStatus={agentStatus}
+                />
+              </div>
+              <div ref={messagesEndRef} />
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
         
         {/* Input Area - Fixed at bottom like ChatGPT */}
