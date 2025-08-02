@@ -116,12 +116,12 @@ const ChatInterface = () => {
           <ChatHeader />
         </div>
         
-        {/* Chat Container - Flex layout for proper message flow */}
-        <div className="flex-1 flex flex-col min-h-0">
+        {/* Chat Container - FULL WIDTH */}
+        <div className="flex-1 flex flex-col min-h-0 w-full">
           {currentMessages.length === 0 ? (
-            // Welcome screen
-            <div className="flex-1 flex flex-col items-center justify-center px-6">
-              <div className="w-full max-w-3xl text-center">
+            // Welcome screen - FULL WIDTH with centered content
+            <div className="flex-1 flex flex-col justify-center w-full px-6">
+              <div className="max-w-3xl mx-auto text-center w-full">
                 <div className="mb-8">
                   <div className="flex items-center justify-center mb-4">
                     <img src="/maxevo-logo.png" alt="MaxEvo" className="h-16 w-auto" />
@@ -164,10 +164,10 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            // Messages Area - Proper flex layout
-            <div className="flex-1 overflow-hidden flex flex-col">
-              <div className="flex-1 overflow-y-auto flex flex-col justify-end">
-                <div className="max-w-3xl mx-auto px-6 py-4 w-full">
+            // Messages Area - FULL WIDTH with centered content
+            <div className="flex-1 overflow-hidden flex flex-col w-full">
+              <div className="flex-1 overflow-y-auto flex flex-col justify-end w-full">
+                <div className="max-w-3xl mx-auto px-6 py-4">
                   <MessageList 
                     messages={currentMessages}
                     isTyping={isTyping}
@@ -180,8 +180,8 @@ const ChatInterface = () => {
             </div>
           )}
           
-          {/* Input Area - Fixed at bottom */}
-          <div className="flex-shrink-0 bg-[#212121] border-t border-gray-700">
+          {/* Input Area - FULL WIDTH with centered content */}
+          <div className="flex-shrink-0 bg-[#212121] border-t border-gray-700 w-full">
             <div className="max-w-3xl mx-auto px-6 py-4">
               <ChatInput 
                 onSendMessage={handleSendMessage}
