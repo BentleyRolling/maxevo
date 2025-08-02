@@ -110,14 +110,14 @@ const ChatInterface = () => {
       </div>
       
       {/* Main Chat Area - FULL REMAINING WIDTH */}
-      <div className="flex-1 flex flex-col bg-[#212121]">
+      <div className="flex-1 flex flex-col bg-[#212121] h-screen max-h-screen">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+        <div className="flex items-center justify-between px-4 py-3 bg-[#212121]">
           <ChatHeader />
         </div>
         
-        {/* Chat Content - FULL WIDTH */}
-        <div className="flex-1 flex flex-col">
+        {/* Chat Content - GENIUS MODE CONTAINMENT */}
+        <div className="flex-1 flex flex-col min-h-0">
           {currentMessages.length === 0 ? (
             // Welcome screen
             <div className="flex-1 flex items-center justify-center">
@@ -164,26 +164,42 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            // Chat Messages
-            <div className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto">
-                <div className="min-h-full flex flex-col justify-end">
-                  <div className="max-w-3xl mx-auto w-full px-6 py-4">
-                    <MessageList 
-                      messages={currentMessages}
-                      isTyping={isTyping}
-                      activeAgent={activeAgent}
-                      agentStatus={agentStatus}
-                    />
-                    <div ref={messagesEndRef} />
-                  </div>
+            // Messages - PERFECT SCROLL CONTAINMENT
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <div 
+                className="h-full overflow-y-auto px-6"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  contain: 'layout style',
+                  willChange: 'scroll-position',
+                  overscrollBehavior: 'contain'
+                }}
+              >
+                <style jsx>{`
+                  div::-webkit-scrollbar {
+                    width: 0px;
+                    background: transparent;
+                  }
+                  div::-webkit-scrollbar-thumb {
+                    background: transparent;
+                  }
+                `}</style>
+                <div className="max-w-3xl mx-auto w-full py-4">
+                  <MessageList 
+                    messages={currentMessages}
+                    isTyping={isTyping}
+                    activeAgent={activeAgent}
+                    agentStatus={agentStatus}
+                  />
+                  <div ref={messagesEndRef} />
                 </div>
               </div>
             </div>
           )}
           
-          {/* Input Area */}
-          <div className="border-t border-gray-700 bg-[#212121]">
+          {/* Input Area - NO BORDERS */}
+          <div className="bg-[#212121] flex-shrink-0">
             <div className="max-w-3xl mx-auto px-6 py-4">
               <ChatInput 
                 onSendMessage={handleSendMessage}
