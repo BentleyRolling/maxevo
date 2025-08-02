@@ -187,7 +187,7 @@ const ChatInterface = () => {
               </div>
             ) : (
               // Messages - SAME WIDTH AS INPUT
-              <div className="w-full max-w-3xl mx-auto py-4">
+              <div className="w-full py-4">
                 <MessageList 
                   messages={currentMessages}
                   isTyping={isTyping}

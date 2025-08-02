@@ -16,15 +16,15 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-3xl mx-auto">
       {messages.map((message, index) => (
         <div key={index} className="group">
           <div className="flex gap-4 justify-start">
             
-            <div className="flex-1 max-w-none w-full">
+            <div className="flex-1 w-full">
               
               {/* Message Content */}
-              <div className="prose prose-sm max-w-none text-white">
+              <div className="prose prose-sm text-white">
                 {message.role === 'user' ? (
                   <div className="bg-[#2f2f2f] rounded-xl px-4 py-3 max-w-2xl ml-auto">
                     <p className="m-0 text-white">{message.content}</p>
@@ -32,7 +32,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
                 ) : (
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
-                    className="prose prose-sm max-w-none prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-white prose-pre:bg-gray-800 prose-pre:text-white prose-a:text-blue-400"
+                    className="prose prose-sm prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-white prose-pre:bg-gray-800 prose-pre:text-white prose-a:text-blue-400"
                   >
                     {message.content}
                   </ReactMarkdown>
