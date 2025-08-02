@@ -20,11 +20,6 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
       {messages.map((message, index) => (
         <div key={index} className="group">
           <div className="flex gap-4 justify-start">
-            {message.role === 'assistant' && (
-              <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center">
-                <img src="/maxevo-logo.png" alt="MaxEvo" className="h-7 w-auto" />
-              </div>
-            )}
             
             <div className="flex-1 max-w-none w-full">
               
@@ -69,17 +64,6 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
                 </div>
               )}
               
-              {/* Metadata */}
-              {message.metadata && (
-                <div className="mt-2 text-xs text-gray-400">
-                  {message.metadata.executionTime && (
-                    <span>Executed in {message.metadata.executionTime}ms</span>
-                  )}
-                  {message.metadata.tokensUsed && (
-                    <span className="ml-2">{message.metadata.tokensUsed} tokens</span>
-                  )}
-                </div>
-              )}
             </div>
             
           </div>
@@ -90,9 +74,6 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
       {isTyping && (
         <div className="group">
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center">
-              <img src="/maxevo-logo.png" alt="MaxEvo" className="h-7 w-auto" />
-            </div>
             <div className="flex-1">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>

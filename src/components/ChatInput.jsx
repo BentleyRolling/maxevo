@@ -32,7 +32,7 @@ const ChatInput = ({ onSendMessage, disabled, placeholder = 'Message MaxEvo...' 
   }
   
   return (
-    <div className="w-full">
+    <div className="w-full max-w-3xl">
       {/* ChatGPT Two-Row Layout */} 
       <form onSubmit={handleSubmit} className="relative">
         <div className="rounded-3xl bg-[#2f2f2f] focus-within:bg-[#404040] transition-colors border border-[#565656] shadow-lg">

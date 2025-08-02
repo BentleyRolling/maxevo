@@ -199,9 +199,9 @@ const ChatInterface = () => {
             )}
           </div>
           
-          {/* Input Area - SOLID BACKGROUND LIKE CHATGPT */}
-          <div className="absolute bottom-0 left-0 right-0 bg-[#212121]">
-            <div className="max-w-3xl mx-auto px-6 py-6">
+          {/* Input Area - 50% TRANSPARENT TOP, SOLID BOTTOM LIKE CHATGPT */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent h-32">
+            <div className="max-w-3xl mx-auto px-6 py-6 h-full flex items-end">
               <ChatInput 
                 onSendMessage={handleSendMessage}
                 disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
