@@ -17,7 +17,8 @@ const Sidebar = () => {
     createChat,
     setCurrentChat,
     deleteChat,
-    toggleSidebar
+    toggleSidebar,
+    sidebarOpen
   } = useMaxEvoStore()
   
   const [editingChat, setEditingChat] = useState(null)
@@ -50,16 +51,29 @@ const Sidebar = () => {
     setEditName('')
   }
   
+  if (!sidebarOpen) {
+    // Collapsed sidebar - just logo
+    return (
+      <div className="h-full bg-[#181818] text-white flex flex-col items-center">
+        <div className="p-3">
+          <button 
+            onClick={toggleSidebar}
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-700 rounded-md transition-colors"
+          >
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-5 w-auto" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-full bg-[#181818] text-white flex flex-col">
       {/* Header with MaxEvo Branding */}
       <div className="p-3">
-        {/* MaxEvo Logo */}
-        <div className="flex items-center gap-3 px-3 py-2 mb-3">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center">
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="w-8 h-8" />
-          </div>
-          <span className="font-semibold text-lg">MaxEvo</span>
+        {/* MaxEvo Logo - Expanded Style */}
+        <div className="flex items-center justify-center px-3 py-4 mb-3">
+          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
         </div>
         
         <button 

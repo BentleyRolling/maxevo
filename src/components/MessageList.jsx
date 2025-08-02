@@ -19,34 +19,21 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
     <div className="space-y-6 py-6">
       {messages.map((message, index) => (
         <div key={index} className="group">
-          <div className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div className="flex gap-4 justify-start">
             {message.role === 'assistant' && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center">
-                <img src="/maxevo-logo.png" alt="MaxEvo" className="w-8 h-8" />
+              <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center">
+                <img src="/maxevo-logo.png" alt="MaxEvo" className="h-7 w-auto" />
               </div>
             )}
             
-            <div className={`flex-1 max-w-none ${message.role === 'user' ? 'max-w-2xl' : ''}`}>
-              {/* Message Header */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium text-white">
-                  {message.role === 'user' ? 'You' : (message.agent || 'MaxEvo')}
-                </span>
-                {message.timestamp && (
-                  <span className="text-xs text-gray-400">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </span>
-                )}
-              </div>
+            <div className="flex-1 max-w-none">
               
               {/* Message Content */}
-              <div className={`prose prose-sm max-w-none ${
-                message.role === 'user' 
-                  ? 'bg-[#2a2a2a] rounded-2xl px-4 py-3 ml-auto' 
-                  : 'text-white'
-              }`}>
+              <div className="prose prose-sm max-w-none text-white">
                 {message.role === 'user' ? (
-                  <p className="m-0 text-white">{message.content}</p>
+                  <div className="bg-[#343541] rounded-2xl px-4 py-3 max-w-2xl ml-auto">
+                    <p className="m-0 text-white">{message.content}</p>
+                  </div>
                 ) : (
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
@@ -95,11 +82,6 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
               )}
             </div>
             
-            {message.role === 'user' && (
-              <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-black" />
-              </div>
-            )}
           </div>
         </div>
       ))}
@@ -108,14 +90,10 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
       {isTyping && (
         <div className="group">
           <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center">
-              <img src="/maxevo-logo.png" alt="MaxEvo" className="w-8 h-8" />
+            <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center">
+              <img src="/maxevo-logo.png" alt="MaxEvo" className="h-7 w-auto" />
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium text-white">MaxEvo</span>
-                <span className="text-xs text-gray-400">is typing...</span>
-              </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

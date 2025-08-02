@@ -105,19 +105,19 @@ const ChatInterface = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar - Exact ChatGPT style */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-200 overflow-hidden bg-[#181818]`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#181818]`}>
         <Sidebar />
       </div>
       
       {/* Main Chat Area - Full width like ChatGPT */}
-      <div className="flex flex-col flex-1 bg-[#212121]">
+      <div className="flex flex-col flex-1 bg-[#212121] relative">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
           <ChatHeader />
         </div>
         
         {/* Messages Area - Full width with proper centering */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-32">
           {currentMessages.length === 0 ? (
             // Welcome screen
             <div className="flex flex-col items-center justify-center h-full py-20 text-center max-w-3xl mx-auto px-4">
@@ -162,21 +162,23 @@ const ChatInterface = () => {
               </div>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto px-4">
-              <MessageList 
-                messages={currentMessages}
-                isTyping={isTyping}
-                activeAgent={activeAgent}
-                agentStatus={agentStatus}
-              />
+            <div className="w-full">
+              <div className="max-w-4xl mx-auto px-4">
+                <MessageList 
+                  messages={currentMessages}
+                  isTyping={isTyping}
+                  activeAgent={activeAgent}
+                  agentStatus={agentStatus}
+                />
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
         
-        {/* Input Area - Full width with proper centering */}
-        <div className="bg-[#212121]">
-          <div className="max-w-4xl mx-auto px-4 py-4">
+        {/* Input Area - Fixed at bottom like ChatGPT */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent">
+          <div className="max-w-4xl mx-auto px-4 pt-6 pb-4">
             <ChatInput 
               onSendMessage={handleSendMessage}
               disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
