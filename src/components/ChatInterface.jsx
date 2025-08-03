@@ -42,7 +42,15 @@ const ChatInterface = () => {
   }, [currentChatId, createChat])
   
   const handleSendMessage = async (content) => {
-    if (!currentChatId || !content.trim()) return
+    console.log('🔥 handleSendMessage called with:', content)
+    console.log('🔥 currentChatId:', currentChatId)
+    
+    if (!currentChatId || !content.trim()) {
+      console.log('❌ Early return - no chatId or empty content')
+      return
+    }
+    
+    console.log('✅ Proceeding with message handling')
     
     // Add user message
     addMessage(currentChatId, {
@@ -50,12 +58,16 @@ const ChatInterface = () => {
       content: content.trim()
     })
     
+    console.log('✅ User message added to store')
+    
     // Show typing indicator
     setIsTyping(true)
     setAgentStatus('thinking', 'MaxEvo')
     
+    console.log('✅ Typing indicator set')
+    
     try {
-      console.log('🚀 Sending message to MaxEvo backend:', content.trim())
+      console.log('🚀 About to send message to MaxEvo backend:', content.trim())
       
       // Send to MaxEvo backend
       const response = await fetch('/api/chat', {
@@ -92,18 +104,20 @@ const ChatInterface = () => {
       setAgentStatus('idle')
       
     } catch (error) {
-      console.error('Chat error:', error)
+      console.error('🔥 CHAT ERROR CAUGHT:', error)
+      console.error('🔥 Error details:', error.message, error.stack)
       
       // Add error message
       addMessage(currentChatId, {
         role: 'assistant',
-        content: '⚠️ Sorry, I encountered an error. Please try again.',
+        content: `⚠️ Sorry, I encountered an error: ${error.message}. Please try again.`,
         agent: 'System',
         error: true
       })
       
       setAgentStatus('error')
     } finally {
+      console.log('🔥 Finally block - setting typing to false')
       setIsTyping(false)
     }
   }
