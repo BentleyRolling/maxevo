@@ -17,15 +17,15 @@ const ChatsView = () => {
   }
 
   return (
-    <div className="h-full bg-gray-950 text-white flex flex-col items-center justify-start pt-8">
+    <div className="h-full bg-[#212121] text-white flex flex-col items-center justify-start pt-8">
       <div className="w-full max-w-4xl px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-medium text-gray-200 mb-4">Your chat history</h1>
+          <h1 className="text-2xl font-medium text-white mb-4">Your chat history</h1>
           <div className="flex justify-center mb-6">
             <button 
               onClick={handleNewChat}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
             >
               <Plus className="w-4 h-4" />
               New chat
@@ -38,12 +38,12 @@ const ChatsView = () => {
             <input
               type="text"
               placeholder="Search your chats..."
-              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full pl-12 pr-4 py-3 bg-[#2f2f2f] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
           
           <p className="text-sm text-gray-400">
-            You have {chats.length} previous chats with Claude. <span className="text-blue-400 cursor-pointer">Select</span>
+            You have {chats.length} previous chats with MaxEvo. <span className="text-blue-400 cursor-pointer">Select</span>
           </p>
         </div>
         
@@ -55,7 +55,7 @@ const ChatsView = () => {
             <div
               key={chat.id}
               onClick={() => handleChatSelect(chat.id)}
-              className="p-4 bg-gray-800 hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
+              className="p-4 bg-[#2a2a2a] hover:bg-[#333333] rounded-lg cursor-pointer transition-colors"
             >
               <h3 className="text-white font-medium mb-1">{chat.title || 'New chat'}</h3>
               <p className="text-sm text-gray-400">
@@ -70,7 +70,7 @@ const ChatsView = () => {
             <p className="text-gray-400 mb-4">No chats yet</p>
             <button 
               onClick={handleNewChat}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors mx-auto"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors mx-auto"
             >
               <Plus className="w-4 h-4" />
               Start your first chat
