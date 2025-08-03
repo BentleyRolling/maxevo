@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MaxEvo Diagnostic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .test-section { background: #2a2a2a; padding: 20px; margin: 15px 0; border-radius: 8px; }
+        .test-result { background: #333; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { border-left: 4px solid #00ff00; }
+        .error { border-left: 4px solid #ff0000; }
+        .warning { border-left: 4px solid #ffaa00; }
+        button { padding: 10px 20px; background: #0066cc; color: white; border: none; cursor: pointer; margin: 5px; border-radius: 4px; }
+        button:hover { background: #0088ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 MaxEvo Complete Diagnostic Test</h1>
+        <p>This will test every aspect of the MaxEvo system to identify the exact issue.</p>
+        
+        <div class="test-section">
+            <h2>1. Backend Health Check</h2>
+            <button onclick="testHealth()">Test Backend Health</button>
+            <div id="health-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Direct API Test</h2>
+            <button onclick="testDirectAPI()">Test API Directly</button>
+            <div id="api-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Frontend React App Test</h2>
+            <button onclick="testReactApp()">Test if React App is Loading</button>
+            <div id="react-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Network Route Test</h2>
+            <button onclick="testNetworkRoutes()">Test All Network Routes</button>
+            <div id="network-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>5. Complete Flow Test</h2>
+            <button onclick="testCompleteFlow()">Test Complete User Flow</button>
+            <div id="flow-result" class="test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Results Summary</h2>
+            <div id="summary" class="test-result"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {};
+        
+        function log(testName, message, type = 'info') {
+            const element = document.getElementById(`${testName}-result`);
+            const timestamp = new Date().toISOString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            element.textContent += logMessage;
+            element.className = `test-result ${type}`;
+            console.log(`${testName}: ${message}`);
+        }
+        
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            summary.textContent = JSON.stringify(testResults, null, 2);
+        }
+        
+        async function testHealth() {
+            log('health', 'Testing backend health...', 'info');
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.maxevo && data.maxevo.status === 'online') {
+                    log('health', '✅ Backend is healthy!', 'success');
+                    log('health', `OpenAI available: ${data.maxevo.components.agentRouter.availableAgents.includes('openai')}`, 'success');
+                    testResults.health = { status: 'success', hasOpenAI: data.maxevo.components.agentRouter.availableAgents.includes('openai') };
+                } else {
+                    log('health', '❌ Backend is not healthy', 'error');
+                    testResults.health = { status: 'error', data };
+                }
+            } catch (error) {
+                log('health', `❌ Health check failed: ${error.message}`, 'error');
+                testResults.health = { status: 'error', error: error.message };
+            }
+            updateSummary();
+        }
+        
+        async function testDirectAPI() {
+            log('api', 'Testing direct API call...', 'info');
+            try {
+                const testPayload = {
+                    chatId: 'diagnostic-test-' + Date.now(),
+                    message: 'who are you',
+                    context: []
+                };
+                
+                log('api', `Sending: ${JSON.stringify(testPayload)}`, 'info');
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testPayload)
+                });
+                
+                log('api', `Response status: ${response.status}`, 'info');
+                
+                const data = await response.json();
+                log('api', `Response agent: ${data.agent}`, 'info');
+                
+                if (data.response && data.response.includes('demonstration of the MaxEvo UI system')) {
+                    log('api', '❌ PROBLEM FOUND: API is returning FALLBACK response!', 'error');
+                    log('api', 'This means MaxEvo backend is not processing the request properly.', 'error');
+                    testResults.api = { status: 'fallback', isFallback: true, response: data.response.substring(0, 100) };
+                } else if (data.response && data.agent === 'openai') {
+                    log('api', '✅ SUCCESS: Real AI response from OpenAI!', 'success');
+                    testResults.api = { status: 'success', agent: data.agent, response: data.response.substring(0, 100) };
+                } else {
+                    log('api', '⚠️ Unknown response type', 'warning');
+                    testResults.api = { status: 'unknown', data };
+                }
+                
+            } catch (error) {
+                log('api', `❌ API test failed: ${error.message}`, 'error');
+                testResults.api = { status: 'error', error: error.message };
+            }
+            updateSummary();
+        }
+        
+        async function testReactApp() {
+            log('react', 'Testing if React app is properly loaded...', 'info');
+            
+            // Check if this page is served by the same server as the React app
+            if (window.location.hostname === 'localhost' && window.location.port === '8080') {
+                log('react', '✅ Running on the same server as backend', 'success');
+            } else {
+                log('react', '⚠️ Running on different server than backend', 'warning');
+            }
+            
+            // Try to access the main React app
+            try {
+                const response = await fetch('/');
+                const html = await response.text();
+                
+                if (html.includes('MaxEvo - AI Orchestration System')) {
+                    log('react', '✅ React app HTML is loading correctly', 'success');
+                    testResults.react = { status: 'success', htmlLoaded: true };
+                } else {
+                    log('react', '❌ React app HTML not found', 'error');
+                    testResults.react = { status: 'error', htmlLoaded: false };
+                }
+                
+            } catch (error) {
+                log('react', `❌ Failed to load React app: ${error.message}`, 'error');
+                testResults.react = { status: 'error', error: error.message };
+            }
+            updateSummary();
+        }
+        
+        async function testNetworkRoutes() {
+            log('network', 'Testing all network routes...', 'info');
+            
+            const routes = ['/health', '/api/status', '/api/tasks'];
+            const results = {};
+            
+            for (const route of routes) {
+                try {
+                    const response = await fetch(route);
+                    results[route] = { status: response.status, ok: response.ok };
+                    log('network', `${route}: ${response.status} ${response.ok ? '✅' : '❌'}`, response.ok ? 'success' : 'error');
+                } catch (error) {
+                    results[route] = { error: error.message };
+                    log('network', `${route}: ERROR - ${error.message}`, 'error');
+                }
+            }
+            
+            testResults.network = results;
+            updateSummary();
+        }
+        
+        async function testCompleteFlow() {
+            log('flow', 'Testing complete user flow simulation...', 'info');
+            
+            try {
+                // Step 1: Load main page
+                log('flow', 'Step 1: Loading main page...', 'info');
+                const mainPage = await fetch('/');
+                log('flow', `Main page: ${mainPage.status}`, mainPage.ok ? 'success' : 'error');
+                
+                // Step 2: Check if frontend assets load
+                log('flow', 'Step 2: Checking frontend assets...', 'info');
+                const jsAsset = await fetch('/assets/index-aaee3cef.js');
+                log('flow', `JS Asset: ${jsAsset.status}`, jsAsset.ok ? 'success' : 'error');
+                
+                // Step 3: Simulate what the React app should do
+                log('flow', 'Step 3: Simulating React app API call...', 'info');
+                const chatResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatId: 'flow-test-' + Date.now(),
+                        message: 'hello test',
+                        context: []
+                    })
+                });
+                
+                const chatData = await chatResponse.json();
+                log('flow', `Chat API: ${chatResponse.status}`, chatResponse.ok ? 'success' : 'error');
+                log('flow', `Response agent: ${chatData.agent}`, 'info');
+                
+                if (chatData.response && chatData.response.includes('demonstration of the MaxEvo UI system')) {
+                    log('flow', '🔥 ISSUE IDENTIFIED: Chat API returns fallback responses', 'error');
+                    log('flow', 'The React app would get mock responses, explaining the problem!', 'error');
+                    testResults.flow = { status: 'issue_found', problem: 'fallback_responses' };
+                } else {
+                    log('flow', '✅ Complete flow working correctly', 'success');
+                    testResults.flow = { status: 'success' };
+                }
+                
+            } catch (error) {
+                log('flow', `❌ Flow test failed: ${error.message}`, 'error');
+                testResults.flow = { status: 'error', error: error.message };
+            }
+            updateSummary();
+        }
+        
+        // Auto-run all tests
+        window.addEventListener('load', async () => {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testDirectAPI();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testReactApp();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testNetworkRoutes();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testCompleteFlow();
+        });
+    </script>
+</body>
+</html>

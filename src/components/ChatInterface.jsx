@@ -55,6 +55,8 @@ const ChatInterface = () => {
     setAgentStatus('thinking', 'MaxEvo')
     
     try {
+      console.log('🚀 Sending message to MaxEvo backend:', content.trim())
+      
       // Send to MaxEvo backend
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -68,11 +70,14 @@ const ChatInterface = () => {
         })
       })
       
+      console.log('📥 Response status:', response.status)
+      
       if (!response.ok) {
         throw new Error('Failed to send message')
       }
       
       const data = await response.json()
+      console.log('📋 Response data:', data)
       
       // Add AI response
       addMessage(currentChatId, {

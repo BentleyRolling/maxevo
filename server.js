@@ -31,6 +31,12 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
+// Log all requests for debugging
+app.use((req, res, next) => {
+  console.log(`📥 ${req.method} ${req.url} - ${req.headers['user-agent']?.slice(0, 50)}...`)
+  next()
+})
+
 // Serve static files in production
 if (NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')))
