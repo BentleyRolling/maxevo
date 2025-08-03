@@ -10,19 +10,8 @@ const ChatHeader = () => {
   
   return (
     <div className="flex items-center justify-between w-full">
-      {/* Left side - Menu and Model Selector */}
+      {/* Left side - Model Selector */}
       <div className="flex items-center gap-2">
-        {/* Menu Button */}
-        {!sidebarOpen && (
-          <button 
-            onClick={toggleSidebar}
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-            title="Open sidebar"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-        )}
-        
         <button className="flex items-center gap-2 px-3 py-1.5 text-white hover:bg-gray-700 rounded-lg transition-colors">
           <span className="font-medium">{chatTitle}</span>
           <ChevronDown className="w-4 h-4 text-gray-400" />

@@ -52,7 +52,7 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - minimal like ChatGPT
+    // Collapsed sidebar - show logo instead of hamburger menu
     return (
       <div className="h-full bg-[#171717] text-white flex flex-col">
         <div className="p-2">
@@ -60,9 +60,7 @@ const Sidebar = () => {
             onClick={toggleSidebar}
             className="flex items-center justify-center w-8 h-8 hover:bg-gray-600 rounded-md transition-colors mb-2"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
           </button>
           <button 
             onClick={handleNewChat}
