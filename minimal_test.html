@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal MaxEvo Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        button { padding: 10px 20px; background: #0066cc; color: white; border: none; cursor: pointer; margin: 10px; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Minimal MaxEvo Frontend Test</h1>
+    <p>This tests EXACTLY what the React frontend should be doing.</p>
+    
+    <button onclick="testAPI()">Send "hi" to MaxEvo API</button>
+    <button onclick="testReactEquivalent()">Simulate React App Call</button>
+    
+    <div id="result" class="result">Ready to test...</div>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing direct API call...\n';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatId: 'test-' + Date.now(),
+                        message: 'hi',
+                        context: []
+                    })
+                });
+                
+                const data = await response.json();
+                result.textContent += `Status: ${response.status}\n`;
+                result.textContent += `Agent: ${data.agent}\n`;
+                result.textContent += `Response: ${data.response}\n\n`;
+                
+                if (data.response.includes('I understand your request about')) {
+                    result.textContent += '❌ PROBLEM: Getting mock response!\n';
+                } else {
+                    result.textContent += '✅ SUCCESS: Real AI response!\n';
+                }
+                
+            } catch (error) {
+                result.textContent += `❌ ERROR: ${error.message}\n`;
+            }
+        }
+        
+        async function testReactEquivalent() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing React-equivalent call...\n';
+            
+            // This mimics exactly what the React ChatInterface does
+            try {
+                console.log('🚀 Sending message to MaxEvo backend:', 'hi');
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chatId: 'react-test-' + Date.now(),
+                        message: 'hi',
+                        context: []
+                    })
+                });
+                
+                console.log('📥 Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to send message');
+                }
+                
+                const data = await response.json();
+                console.log('📋 Response data:', data);
+                
+                result.textContent += `React simulation results:\n`;
+                result.textContent += `Status: ${response.status}\n`;
+                result.textContent += `Agent: ${data.agent}\n`;
+                result.textContent += `Response: ${data.response}\n\n`;
+                
+                if (data.response.includes('I understand your request about')) {
+                    result.textContent += '❌ REACT PROBLEM: Getting mock response!\n';
+                    result.textContent += 'This proves React app would see mock responses.\n';
+                } else {
+                    result.textContent += '✅ REACT SUCCESS: Would get real AI response!\n';
+                }
+                
+            } catch (error) {
+                result.textContent += `❌ REACT ERROR: ${error.message}\n`;
+                console.error('React simulation error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

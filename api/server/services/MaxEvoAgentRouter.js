@@ -131,15 +131,20 @@ class MaxEvoAgentRouter {
       const model = agentChoice.model
       
       console.log(`🎯 Routing task ${task.id} to ${agent} (${model})`)
+      console.log(`🔍 Debug - agent: "${agent}", this.agents.has('openai'): ${this.agents.has('openai')}`)
+      console.log(`🔍 Debug - Available agents: [${Array.from(this.agents.keys()).join(', ')}]`)
       
       // Execute the task with the selected agent
       let result
       if (agent === 'anthropic' && this.agents.has('anthropic')) {
+        console.log(`✅ Using Anthropic/Claude`)
         result = await this.executeWithClaude(task, model)
       } else if (agent === 'openai' && this.agents.has('openai')) {
+        console.log(`✅ Using OpenAI/GPT`)
         result = await this.executeWithOpenAI(task, model)
       } else {
         // Fallback to mock response if no agents available
+        console.log(`❌ FALLING BACK TO MOCK - agent: "${agent}", has openai: ${this.agents.has('openai')}, has anthropic: ${this.agents.has('anthropic')}`)
         result = await this.executeMockResponse(task, agent)
       }
       
