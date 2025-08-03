@@ -21,7 +21,8 @@ const Sidebar = () => {
     setCurrentChat,
     deleteChat,
     toggleSidebar,
-    sidebarOpen
+    sidebarOpen,
+    setCurrentView
   } = useMaxEvoStore()
   
   const [editingChat, setEditingChat] = useState(null)
@@ -92,8 +93,24 @@ const Sidebar = () => {
           </button>
         </div>
         
-        {/* Top Section - New chat and Search */}
+        {/* Top Section - Chats and Projects Navigation */}
         <div className="space-y-2 mb-6">
+          <button 
+            onClick={() => setCurrentView('chats')}
+            className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Chats
+          </button>
+          
+          <button 
+            onClick={() => setCurrentView('projects')}
+            className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+          >
+            <Folder className="w-4 h-4" />
+            Projects
+          </button>
+          
           <button 
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
