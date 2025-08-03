@@ -60,7 +60,7 @@ const Sidebar = () => {
             onClick={toggleSidebar}
             className="flex items-center justify-center w-8 h-8 hover:bg-gray-600 rounded-md transition-colors mb-2"
           >
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
+            <img src="/maxevo-icon.svg" alt="MaxEvo" className="h-6 w-6" />
           </button>
           <button 
             onClick={handleNewChat}
