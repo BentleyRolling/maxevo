@@ -5,55 +5,8 @@ const http = require('http')
 const path = require('path')
 const fs = require('fs')
 
-// Mock MaxEvo services for standalone deployment
-class MockMaxEvoCore {
-  async initialize() {
-    console.log('✅ Mock MaxEvo Core initialized')
-  }
-}
-
-class MockMaxEvoAgentRouter {
-  constructor(core) {
-    this.core = core
-  }
-  
-  async initialize() {
-    console.log('✅ Mock Agent Router initialized')
-  }
-  
-  async routeTask(task) {
-    // Simulate agent routing with fallback responses
-    return {
-      response: this.generateResponse(task.content),
-      agent: 'MaxEvo',
-      taskId: 'mock-task-' + Date.now()
-    }
-  }
-  
-  generateResponse(message) {
-    const responses = [
-      `I understand your request and I'm working on it. In a full deployment, I would coordinate with multiple AI agents to provide the best response.`,
-      `Your request has been analyzed and distributed to the appropriate systems. This is a demo response showing the MaxEvo UI interface.`,
-      `I'm ready to help with complex tasks involving multiple agents, automation, and intelligent routing. This demo shows the ChatGPT-style interface.`
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-}
-
-class MockMaxEvoScheduler {
-  async initialize() {
-    console.log('✅ Mock Scheduler initialized')
-  }
-}
-
-const MockTaskRunner = {
-  async getTaskRunner() {
-    return {
-      status: 'mock-ready',
-      execute: () => console.log('Mock task executed')
-    }
-  }
-}
+// Import real MaxEvo services
+const MaxEvoInitializer = require('./api/server/services/initializeMaxEvo')
 
 const app = express()
 const server = http.createServer(app)
@@ -64,10 +17,8 @@ const PORT = process.env.PORT || 8080
 const NODE_ENV = process.env.NODE_ENV || 'development'
 
 // Initialize MaxEvo components
-let maxevoCore = null
-let agentRouter = null
-let scheduler = null
-let taskRunner = null
+let maxevoInitializer = null
+let maxevoComponents = null
 
 // Middleware
 app.use(cors({
@@ -87,41 +38,26 @@ async function initializeMaxEvo() {
   try {
     console.log('🚀 Initializing MaxEvo system...')
     
-    // Initialize mock components for standalone deployment
-    try {
-      maxevoCore = new MockMaxEvoCore()
-      await maxevoCore.initialize()
-    } catch (error) {
-      console.warn('⚠️ MaxEvo Core initialization failed:', error.message)
-    }
+    // Initialize the real MaxEvo orchestration system
+    maxevoInitializer = new MaxEvoInitializer({
+      enableMemory: true,
+      enableScheduler: true,
+      enableAgentRouter: true,
+      memoryPath: path.join(__dirname, 'data', 'memory')
+    })
     
-    if (maxevoCore) {
-      try {
-        agentRouter = new MockMaxEvoAgentRouter(maxevoCore)
-        await agentRouter.initialize()
-      } catch (error) {
-        console.warn('⚠️ Agent Router initialization failed:', error.message)
-      }
-      
-      try {
-        scheduler = new MockMaxEvoScheduler()
-        await scheduler.initialize()
-      } catch (error) {
-        console.warn('⚠️ Scheduler initialization failed:', error.message)
-      }
-    }
-    
-    try {
-      taskRunner = await MockTaskRunner.getTaskRunner()
-      console.log('✅ Task Runner initialized')
-    } catch (error) {
-      console.warn('⚠️ Task Runner initialization failed:', error.message)
-    }
+    // Initialize all components
+    maxevoComponents = await maxevoInitializer.initialize()
     
     console.log('🌟 MaxEvo system initialization complete')
     
   } catch (error) {
     console.error('❌ MaxEvo system initialization failed:', error)
+    console.log('⚠️ Falling back to basic system without full MaxEvo orchestration')
+    
+    // Set fallback null values so the system can still function
+    maxevoInitializer = null
+    maxevoComponents = null
   }
 }
 
@@ -131,9 +67,10 @@ wss.on('connection', (ws, req) => {
   
   // Send initial system status
   const systemStatus = {
-    memoryCore: maxevoCore ? 'online' : 'offline',
-    scheduler: scheduler ? 'online' : 'offline', 
-    agentRouter: agentRouter ? 'online' : 'offline',
+    memoryCore: maxevoComponents?.memoryCore ? 'online' : 'offline',
+    scheduler: maxevoComponents?.scheduler ? 'online' : 'offline', 
+    agentRouter: maxevoComponents?.agentRouter ? 'online' : 'offline',
+    core: maxevoComponents?.core ? 'online' : 'offline',
     webSocket: 'online'
   }
   
@@ -184,15 +121,12 @@ wss.on('connection', (ws, req) => {
 
 // Health check
 app.get('/health', (req, res) => {
+  const healthStatus = maxevoInitializer ? maxevoInitializer.getSystemStatus() : { status: 'offline' }
+  
   res.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    maxevo: {
-      core: maxevoCore ? 'online' : 'offline',
-      router: agentRouter ? 'online' : 'offline',
-      scheduler: scheduler ? 'online' : 'offline',
-      taskRunner: taskRunner ? 'online' : 'offline'
-    }
+    maxevo: healthStatus
   })
 })
 
@@ -207,29 +141,24 @@ app.post('/api/chat', async (req, res) => {
     
     console.log(`💬 Chat request for ${chatId}: ${message.slice(0, 100)}...`)
     
-    // Simulate agent processing
+    // Process through MaxEvo system
     let response = ''
     let agent = 'MaxEvo'
     let taskId = null
     
-    if (agentRouter && maxevoCore) {
+    if (maxevoInitializer && maxevoComponents) {
       try {
-        // Route the message to appropriate agent
-        const routingResult = await agentRouter.routeTask({
-          type: 'chat',
-          content: message,
-          context: context.slice(-5), // Last 5 messages for context
-          chatId
-        })
+        // Process the chat message through the real MaxEvo system
+        const result = await maxevoInitializer.processChatMessage(chatId, message, context.slice(-5))
         
-        response = routingResult.response || 'Task has been routed to the appropriate agent.'
-        agent = routingResult.agent || 'MaxEvo'
-        taskId = routingResult.taskId
+        response = result.response || 'Task has been processed by MaxEvo.'
+        agent = result.agent || 'MaxEvo'
+        taskId = result.taskId
         
       } catch (error) {
-        console.error('Agent routing error:', error)
-        response = 'I understand your request. Let me help you with that.'
-        agent = 'MaxEvo'
+        console.error('MaxEvo processing error:', error)
+        response = 'I understand your request. Let me help you with that using the MaxEvo system.'
+        agent = 'MaxEvo Core'
       }
     } else {
       // Fallback responses when MaxEvo components aren't available
@@ -261,12 +190,11 @@ app.post('/api/chat', async (req, res) => {
 
 // System status endpoint
 app.get('/api/status', (req, res) => {
+  const systemStatus = maxevoInitializer ? maxevoInitializer.getSystemStatus() : { status: 'offline' }
+  
   res.json({
     system: {
-      memoryCore: maxevoCore ? 'online' : 'offline',
-      scheduler: scheduler ? 'online' : 'offline',
-      agentRouter: agentRouter ? 'online' : 'offline',
-      taskRunner: taskRunner ? 'online' : 'offline',
+      maxevo: systemStatus,
       webSocket: 'online'
     },
     stats: {
@@ -280,9 +208,16 @@ app.get('/api/status', (req, res) => {
 
 // Tasks endpoint
 app.get('/api/tasks', (req, res) => {
-  // TODO: Get tasks from MaxEvo system
+  let tasks = []
+  
+  if (maxevoComponents?.scheduler) {
+    const scheduledTasks = maxevoComponents.scheduler.getScheduledTasks()
+    const recurringTasks = maxevoComponents.scheduler.getRecurringTasks()
+    tasks = [...scheduledTasks, ...recurringTasks]
+  }
+  
   res.json({
-    tasks: [],
+    tasks,
     timestamp: new Date().toISOString()
   })
 })
@@ -413,21 +348,27 @@ async function startServer() {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+async function shutdown() {
   console.log('🛑 Shutting down gracefully...')
+  
+  // Shutdown MaxEvo system first
+  if (maxevoInitializer) {
+    try {
+      await maxevoInitializer.shutdown()
+    } catch (error) {
+      console.error('❌ Error shutting down MaxEvo:', error)
+    }
+  }
+  
+  // Close server
   server.close(() => {
     console.log('✅ Server closed')
     process.exit(0)
   })
-})
+}
 
-process.on('SIGINT', () => {
-  console.log('🛑 Shutting down gracefully...')
-  server.close(() => {
-    console.log('✅ Server closed')
-    process.exit(0)
-  })
-})
+process.on('SIGTERM', shutdown)
+process.on('SIGINT', shutdown)
 
 // Start the server
 startServer()

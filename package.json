@@ -21,7 +21,10 @@
     "ws": "^8.13.0",
     "cors": "^2.8.5",
     "node-cron": "^3.0.2",
-    "axios": "^1.4.0"
+    "axios": "^1.4.0",
+    "uuid": "^9.0.0",
+    "@anthropic-ai/sdk": "^0.21.1",
+    "openai": "^4.47.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
