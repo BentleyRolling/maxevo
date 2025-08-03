@@ -60,7 +60,7 @@ const Sidebar = () => {
             onClick={toggleSidebar}
             className="flex items-center justify-center w-8 h-8 hover:bg-gray-600 rounded-md transition-colors mb-2"
           >
-            <img src="/spiral-logo.png" alt="MaxEvo" className="h-6 w-auto" />
+            <img src="/spiral-only.png" alt="MaxEvo" className="h-6 w-auto" />
           </button>
           <button 
             onClick={handleNewChat}
