@@ -165,6 +165,7 @@ app.post('/api/chat', async (req, res) => {
       }
     } else {
       // Fallback responses when MaxEvo components aren't available
+      console.warn('⚠️ MaxEvo system not available - using fallback response')
       response = generateFallbackResponse(message)
     }
     

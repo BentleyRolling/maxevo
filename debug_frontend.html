@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MaxEvo Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; background: #2a2a2a; color: white; border: 1px solid #444; }
+        button { padding: 10px 20px; background: #0066cc; color: white; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background: #0088ff; }
+        .response { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; }
+        .logs { background: #333; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 MaxEvo Frontend Debug Tool</h1>
+        
+        <h3>Test Message:</h3>
+        <textarea id="messageInput" placeholder="Enter your test message...">who are you</textarea>
+        
+        <div>
+            <button onclick="testAPI()">🧪 Test API Direct</button>
+            <button onclick="testRelative()">🌐 Test Relative URL (what frontend uses)</button>
+            <button onclick="testHealthCheck()">❤️ Test Health Check</button>
+        </div>
+        
+        <div id="logs" class="logs"></div>
+        <div id="response" class="response"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logs = document.getElementById('logs');
+            logs.textContent += new Date().toISOString() + ': ' + message + '\n';
+            console.log(message);
+        }
+
+        function showResponse(data) {
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testHealthCheck() {
+            log('Testing health check...');
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                log('Health check success: ' + response.status);
+                showResponse(data);
+            } catch (error) {
+                log('Health check error: ' + error.message);
+                showResponse({error: error.message});
+            }
+        }
+
+        async function testRelative() {
+            log('Testing relative URL /api/chat (what the frontend React app uses)...');
+            const message = document.getElementById('messageInput').value;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chatId: 'debug-test-' + Date.now(),
+                        message: message,
+                        context: []
+                    })
+                });
+                
+                const data = await response.json();
+                log('Relative API success: ' + response.status);
+                log('Agent: ' + data.agent + ', TaskId: ' + data.taskId);
+                showResponse(data);
+                
+                // Check if this is a real AI response or fallback
+                if (data.response.includes('I understand your request about') || 
+                    data.response.includes('In a fully deployed MaxEvo system')) {
+                    log('⚠️ WARNING: This looks like a FALLBACK response, not real AI!');
+                } else {
+                    log('✅ SUCCESS: This looks like a real AI response!');
+                }
+                
+            } catch (error) {
+                log('Relative API error: ' + error.message);
+                showResponse({error: error.message});
+            }
+        }
+
+        async function testAPI() {
+            log('Testing direct API call to localhost:8080...');
+            const message = document.getElementById('messageInput').value;
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        chatId: 'debug-direct-' + Date.now(),
+                        message: message,
+                        context: []
+                    })
+                });
+                
+                const data = await response.json();
+                log('Direct API success: ' + response.status);
+                log('Agent: ' + data.agent + ', TaskId: ' + data.taskId);
+                showResponse(data);
+                
+            } catch (error) {
+                log('Direct API error: ' + error.message);
+                showResponse({error: error.message});
+            }
+        }
+
+        // Auto-run health check when page loads
+        window.addEventListener('load', () => {
+            log('MaxEvo Debug Tool loaded');
+            testHealthCheck();
+        });
+    </script>
+</body>
+</html>
