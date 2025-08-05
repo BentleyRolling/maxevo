@@ -90,6 +90,8 @@ const ChatInterface = () => {
       
       const data = await response.json()
       console.log('📋 Response data:', data)
+      console.log('🔥 ACTUAL RESPONSE TEXT:', data.response)
+      console.log('🔥 ACTUAL AGENT:', data.agent)
       
       // Add AI response
       addMessage(currentChatId, {
