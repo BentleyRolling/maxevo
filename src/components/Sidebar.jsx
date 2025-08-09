@@ -46,8 +46,8 @@ const Sidebar = () => {
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
       {/* Header - ChatGPT Style Fixed Logo Positioning */}
-      <div className="px-2 pt-4 pb-2">
-        <div className="flex items-center h-12 mb-4">
+      <div className="px-2 py-3">
+        <div className="flex items-center h-8 mb-2">
           {/* Fixed width container for logo - always centered in its column */}
           <div className="w-12 flex justify-center flex-shrink-0">
             <img 
@@ -74,12 +74,12 @@ const Sidebar = () => {
       </div>
 
       {/* Menu Items - ChatGPT Style Fixed Icon Positioning */}
-      <div className="px-2 pb-4">
+      <div className="px-2">
         {menuItems.map((item, index) => (
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full flex items-center py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center py-2.5 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             {/* Fixed width container for icon - always centered */}
@@ -125,7 +125,7 @@ const Sidebar = () => {
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full flex items-center py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center py-2.5 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             {/* Fixed width container for icon - always centered */}
