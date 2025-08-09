@@ -56,10 +56,10 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - EXACTLY like ChatGPT: logo stays static, icons centered below
+    // Collapsed sidebar - EXACTLY like ChatGPT: same positions, same sizes, just no text
     return (
       <div className="h-full bg-[#171717] text-white flex flex-col">
-        {/* Header - EXACT same position and size as expanded */}
+        {/* Header - IDENTICAL position as expanded */}
         <div className="p-4">
           <div className="flex items-center justify-center mb-4">
             <button 
@@ -71,14 +71,14 @@ const Sidebar = () => {
             </button>
           </div>
           
-          {/* Menu items - centered icons aligned with logo */}
+          {/* Menu items - SAME size and position as expanded, just centered */}
           <div className="space-y-2 mb-6">
             <button 
               onClick={() => setCurrentView('chats')}
               className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Chats"
             >
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-5 h-5" />
             </button>
             
             <button 
@@ -86,7 +86,7 @@ const Sidebar = () => {
               className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Projects"
             >
-              <Folder className="w-4 h-4" />
+              <Folder className="w-5 h-5" />
             </button>
             
             <button 
@@ -94,24 +94,24 @@ const Sidebar = () => {
               className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="New chat"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-5 h-5" />
             </button>
             
             <button className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Search chats"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-5 h-5" />
             </button>
           </div>
         </div>
         
-        {/* Footer - centered icons */}
+        {/* Footer - SAME size icons */}
         <div className="p-4 mt-auto">
           <div className="flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-            <User className="w-4 h-4" />
+            <User className="w-5 h-5" />
           </div>
           <div className="flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-            <Settings className="w-4 h-4" />
+            <Settings className="w-5 h-5" />
           </div>
         </div>
       </div>
@@ -120,13 +120,13 @@ const Sidebar = () => {
 
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
-      {/* Header - ChatGPT Style with larger logo and more padding */}
+      {/* Header - EXACT same structure as collapsed, just add hamburger */}
       <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-center mb-4">
           <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
           <button 
             onClick={toggleSidebar}
-            className="p-2 hover:bg-[#212121] rounded transition-colors"
+            className="absolute right-4 p-2 hover:bg-[#212121] rounded transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -134,13 +134,13 @@ const Sidebar = () => {
           </button>
         </div>
         
-        {/* Top Section - Chats and Projects Navigation */}
+        {/* Menu items - centered like collapsed, but with text */}
         <div className="space-y-2 mb-6">
           <button 
             onClick={() => setCurrentView('chats')}
             className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-5 h-5" />
             Chats
           </button>
           
@@ -148,7 +148,7 @@ const Sidebar = () => {
             onClick={() => setCurrentView('projects')}
             className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
           >
-            <Folder className="w-4 h-4" />
+            <Folder className="w-5 h-5" />
             Projects
           </button>
           
@@ -156,22 +156,13 @@ const Sidebar = () => {
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             New chat
           </button>
           
           <button className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors">
-            <Search className="w-4 h-4" />
+            <Search className="w-5 h-5" />
             Search chats
-          </button>
-        </div>
-        
-        {/* Projects Section */}
-        <div className="mb-6">
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-2 px-3">Projects</div>
-          <button className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors">
-            <FolderPlus className="w-4 h-4" />
-            New project
           </button>
         </div>
       </div>
@@ -232,14 +223,14 @@ const Sidebar = () => {
         </div>
       </div>
       
-      {/* Footer */}
-      <div className="p-4">
+      {/* Footer - SAME structure as collapsed */}
+      <div className="p-4 mt-auto">
         <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-          <User className="w-4 h-4" />
+          <User className="w-5 h-5" />
           <span>Account</span>
         </div>
         <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-          <Settings className="w-4 h-4" />
+          <Settings className="w-5 h-5" />
           <span>Settings</span>
         </div>
       </div>
