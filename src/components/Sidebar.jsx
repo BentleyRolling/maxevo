@@ -73,7 +73,7 @@ const Sidebar = () => {
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full flex items-center gap-3 p-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center gap-3 px-2 py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -115,7 +115,7 @@ const Sidebar = () => {
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full flex items-center gap-3 p-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center gap-3 px-2 py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
