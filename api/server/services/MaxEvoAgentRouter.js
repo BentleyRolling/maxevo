@@ -489,7 +489,7 @@ class MaxEvoAgentRouter {
       basePrompt += ' I have already searched the web for current information related to this query. Use this information along with your knowledge to provide the most accurate and up-to-date response.'
     }
 
-    basePrompt += ' Format your responses with excellent structure and readability:\n\n**FORMATTING REQUIREMENTS:**\n- Use ## headers for main sections\n- Use ### headers for subsections\n- Use **bold text** for product names and important points\n- Use bullet points (•) for features and lists\n- Use numbered lists (1. 2. 3.) for rankings and steps\n- Add proper spacing between sections with double line breaks\n- Include relevant emojis to enhance readability (🎧 🔋 💰 ⭐)\n- Use > blockquotes for key takeaways\n- Separate different items/products with clear visual breaks\n\n**STRUCTURE EXAMPLE:**\n## Best Headphones Under $200 🎧\n\n### 1. **Sony WH-CH710N** - $150\n• **Noise Cancellation:** Excellent active noise canceling\n• **Battery Life:** Up to 35 hours\n• **Sound Quality:** Clear, balanced, and powerful\n\n### 2. **Audio-Technica ATH-M50x** - $149\n• **Build Quality:** Professional-grade construction\n• **Comfort:** Great for long listening sessions\n\nProvide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
+    basePrompt += ' Respond in clean Markdown only. Use headings, lists, code fences, tables, and blockquotes when helpful. No HTML. Provide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
 
     return basePrompt
   }
