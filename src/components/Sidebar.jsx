@@ -59,13 +59,18 @@ const Sidebar = () => {
     // Collapsed sidebar - show logo instead of hamburger menu
     return (
       <div className="h-full bg-[#171717] text-white flex flex-col">
-        <div className="p-2">
-          <button 
-            onClick={toggleSidebar}
-            className="flex items-center justify-center w-8 h-8 hover:bg-[#212121] rounded-md transition-colors mb-2"
-          >
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-4 w-auto" />
-          </button>
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
+            <button 
+              onClick={toggleSidebar}
+              className="p-2 hover:bg-[#212121] rounded transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+              </svg>
+            </button>
+          </div>
           <button 
             onClick={handleNewChat}
             className="flex items-center justify-center w-8 h-8 hover:bg-[#212121] rounded-md transition-colors"
@@ -82,10 +87,7 @@ const Sidebar = () => {
       {/* Header - ChatGPT Style with larger logo and more padding */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-4 w-auto" />
-            <span className="text-2xl font-bold text-white">MaxEvo</span>
-          </div>
+          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
           <button 
             onClick={toggleSidebar}
             className="p-2 hover:bg-[#212121] rounded transition-colors"
