@@ -75,7 +75,10 @@ class MaxEvoAgentRouter {
     }
     
     if (this.agents.size === 0) {
-      console.warn('⚠️ No AI service API keys found - using mock responses')
+      const error = new Error('No AI service API keys configured')
+      error.code = 'MISSING_API_KEYS'
+      console.error('❌ No AI service API keys found - system cannot function')
+      throw error
     }
   }
 
@@ -143,9 +146,10 @@ class MaxEvoAgentRouter {
         console.log(`✅ Using OpenAI/GPT`)
         result = await this.executeWithOpenAI(task, model)
       } else {
-        // Fallback to mock response if no agents available
-        console.log(`❌ FALLING BACK TO MOCK - agent: "${agent}", has openai: ${this.agents.has('openai')}, has anthropic: ${this.agents.has('anthropic')}`)
-        result = await this.executeMockResponse(task, agent)
+        // This should not happen if selectAgent works correctly
+        const error = new Error(`Selected agent "${agent}" is not available`)
+        error.code = 'AGENT_UNAVAILABLE'
+        throw error
       }
       
       // Update stats
@@ -203,8 +207,10 @@ class MaxEvoAgentRouter {
       return { agent: 'openai', model: 'gpt-4' }
     }
     
-    // No agents available - return mock
-    return { agent: 'mock', model: 'maxevo-mock' }
+    // No agents available - throw error
+    const error = new Error('No AI agents available for task routing')
+    error.code = 'NO_AGENTS_AVAILABLE'
+    throw error
   }
 
   /**
