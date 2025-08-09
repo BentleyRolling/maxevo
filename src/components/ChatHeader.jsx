@@ -9,7 +9,7 @@ const ChatHeader = () => {
   const chatTitle = currentChat?.title || 'MaxEvo'
   
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full -ml-2 -mt-1">
       {/* Left side - Model Selector */}
       <div className="flex items-center gap-2">
         <button className="flex items-center gap-2 px-3 py-1.5 text-white hover:bg-gray-700 rounded-lg transition-colors">
