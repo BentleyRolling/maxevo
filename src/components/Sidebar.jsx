@@ -64,7 +64,7 @@ const Sidebar = () => {
             onClick={toggleSidebar}
             className="flex items-center justify-center w-8 h-8 hover:bg-[#212121] rounded-md transition-colors mb-2"
           >
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-5 w-auto" />
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-4 w-auto" />
           </button>
           <button 
             onClick={handleNewChat}
@@ -83,8 +83,8 @@ const Sidebar = () => {
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-5 w-auto" />
-            <span className="text-xl font-semibold text-white">MaxEvo</span>
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-4 w-auto" />
+            <span className="text-2xl font-bold text-white">MaxEvo</span>
           </div>
           <button 
             onClick={toggleSidebar}
