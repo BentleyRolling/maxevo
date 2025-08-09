@@ -73,11 +73,18 @@ const Sidebar = () => {
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full flex items-center justify-center gap-3 py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full relative py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
-            <item.icon className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span className="text-sm">{item.label}</span>}
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+              <item.icon className="w-5 h-5" />
+            </div>
+            {sidebarOpen && (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 mr-3 opacity-0"></div>
+                <span className="text-sm">{item.label}</span>
+              </div>
+            )}
           </button>
         ))}
       </div>
@@ -115,11 +122,18 @@ const Sidebar = () => {
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full flex items-center justify-center gap-3 py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full relative py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
-            <item.icon className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span className="text-sm">{item.label}</span>}
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+              <item.icon className="w-5 h-5" />
+            </div>
+            {sidebarOpen && (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 mr-3 opacity-0"></div>
+                <span className="text-sm">{item.label}</span>
+              </div>
+            )}
           </button>
         ))}
       </div>
