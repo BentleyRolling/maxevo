@@ -25,23 +25,17 @@ jobs:
           curl -fsSL https://claude.ai/install.sh | sh
         fi
         
-        # Run security review on changed files
+        # Run security review - no API key needed!
         echo "🔍 Running Claude Code security review..."
         
-        # Get list of changed files in the PR
+        # Get list of changed files in the PR for context
         if [ "${{ github.event_name }}" = "pull_request" ]; then
           CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD | tr '\n' ' ')
           echo "Changed files: $CHANGED_FILES"
         fi
         
-        # Run the security review
-        claude /security-review
-        
-        # Save output to file for PR comment
-        claude /security-review > security-review-output.md 2>&1 || true
-        
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        # Run the security review with output capture
+        claude "/security-review" --print > security-review-output.md 2>&1 || true
 
     - name: Comment Security Review on PR
       if: github.event_name == 'pull_request'

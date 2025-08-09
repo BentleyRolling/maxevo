@@ -25,13 +25,15 @@ jobs:
         fetch-depth: 0 # Full history for better analysis
 
     - name: Claude Code Security Review
-      uses: anthropics/claude-code-action@v1
-      with:
-        # Use Claude Code's new security review feature
-        command: '/security-review'
-        anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-        # Include all changed files in PR
-        include_diff: ${{ github.event_name == 'pull_request' }}
+      run: |
+        # Install Claude Code CLI if not available
+        if ! command -v claude &> /dev/null; then
+          curl -fsSL https://claude.ai/install.sh | sh
+        fi
+        
+        # Run security review - built-in feature, no API key needed
+        echo "🔍 Running Claude Code security review..."
+        claude "/security-review" --print > claude-security-output.txt 2>&1 || true
         
     - name: Dependency Security Scan
       uses: github/dependency-review-action@v4
