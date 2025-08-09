@@ -56,26 +56,32 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - show logo instead of hamburger menu
+    // Collapsed sidebar - like ChatGPT
     return (
-      <div className="h-full bg-[#171717] text-white flex flex-col">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
-            <button 
-              onClick={toggleSidebar}
-              className="p-2 hover:bg-[#212121] rounded transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-              </svg>
-            </button>
-          </div>
-          <button 
-            onClick={handleNewChat}
-            className="flex items-center justify-center w-8 h-8 hover:bg-[#212121] rounded-md transition-colors"
-          >
-            <Plus className="w-4 h-4" />
+      <div className="h-full bg-[#171717] text-white flex flex-col items-center py-4">
+        {/* Logo - clickable to expand */}
+        <button 
+          onClick={toggleSidebar}
+          className="mb-4 p-2 hover:bg-[#212121] rounded-md transition-colors"
+        >
+          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
+        </button>
+        
+        {/* New chat button */}
+        <button 
+          onClick={handleNewChat}
+          className="mb-4 p-2 hover:bg-[#212121] rounded-md transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+        
+        {/* Menu item icons */}
+        <div className="space-y-2">
+          <button className="p-2 hover:bg-[#212121] rounded-md transition-colors">
+            <MessageSquare className="w-5 h-5" />
+          </button>
+          <button className="p-2 hover:bg-[#212121] rounded-md transition-colors">
+            <Folder className="w-5 h-5" />
           </button>
         </div>
       </div>
