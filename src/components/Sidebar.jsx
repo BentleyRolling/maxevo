@@ -56,12 +56,12 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - EXACTLY like ChatGPT: same positions, same sizes, just no text
+    // Collapsed sidebar - EXACTLY like ChatGPT: same LEFT positions, just no text
     return (
       <div className="h-full bg-[#171717] text-white flex flex-col">
-        {/* Header - IDENTICAL position as expanded */}
+        {/* Header - EXACT same LEFT position as expanded */}
         <div className="p-4">
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center mb-4">
             <button 
               onClick={toggleSidebar}
               className="hover:bg-[#212121] rounded transition-colors p-1"
@@ -71,11 +71,11 @@ const Sidebar = () => {
             </button>
           </div>
           
-          {/* Menu items - SAME size and position as expanded, just centered */}
+          {/* Menu items - LEFT-aligned like expanded, just no text */}
           <div className="space-y-2 mb-6">
             <button 
               onClick={() => setCurrentView('chats')}
-              className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Chats"
             >
               <MessageSquare className="w-5 h-5" />
@@ -83,7 +83,7 @@ const Sidebar = () => {
             
             <button 
               onClick={() => setCurrentView('projects')}
-              className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Projects"
             >
               <Folder className="w-5 h-5" />
@@ -91,13 +91,13 @@ const Sidebar = () => {
             
             <button 
               onClick={handleNewChat}
-              className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="New chat"
             >
               <Plus className="w-5 h-5" />
             </button>
             
-            <button className="w-full flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            <button className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
               title="Search chats"
             >
               <Search className="w-5 h-5" />
@@ -105,12 +105,12 @@ const Sidebar = () => {
           </div>
         </div>
         
-        {/* Footer - SAME size icons */}
+        {/* Footer - LEFT-aligned like expanded */}
         <div className="p-4 mt-auto">
-          <div className="flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
+          <div className="flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
             <User className="w-5 h-5" />
           </div>
-          <div className="flex items-center justify-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
+          <div className="flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
             <Settings className="w-5 h-5" />
           </div>
         </div>
@@ -120,13 +120,13 @@ const Sidebar = () => {
 
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
-      {/* Header - EXACT same structure as collapsed, just add hamburger */}
+      {/* Header - LEFT-aligned like ChatGPT */}
       <div className="p-4">
-        <div className="flex items-center justify-center mb-4">
+        <div className="flex items-center justify-between mb-4">
           <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
           <button 
             onClick={toggleSidebar}
-            className="absolute right-4 p-2 hover:bg-[#212121] rounded transition-colors"
+            className="p-2 hover:bg-[#212121] rounded transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -134,7 +134,7 @@ const Sidebar = () => {
           </button>
         </div>
         
-        {/* Menu items - centered like collapsed, but with text */}
+        {/* Menu items - LEFT-aligned like ChatGPT */}
         <div className="space-y-2 mb-6">
           <button 
             onClick={() => setCurrentView('chats')}
