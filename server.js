@@ -166,13 +166,32 @@ app.post('/api/chat', async (req, res) => {
         
       } catch (error) {
         console.error('MaxEvo processing error:', error)
-        response = 'I understand your request. Let me help you with that using the MaxEvo system.'
-        agent = 'MaxEvo Core'
+        // Return proper error instead of canned response
+        return res
+          .status(502)
+          .set('x-maxevo-error', 'PROVIDER_FAILURE')
+          .json({
+            error: true,
+            isError: true,
+            agent: 'MaxEvo',
+            code: 'PROVIDER_FAILURE',
+            message: 'Upstream model call failed',
+            detail: process.env.NODE_ENV === 'production' ? undefined : error.message
+          })
       }
     } else {
-      // Fallback responses when MaxEvo components aren't available
-      console.warn('⚠️ MaxEvo system not available - using fallback response')
-      response = generateFallbackResponse(message)
+      // MaxEvo components aren't available - return error
+      console.error('❌ MaxEvo system not available - no fallback allowed')
+      return res
+        .status(503)
+        .set('x-maxevo-error', 'SYSTEM_UNAVAILABLE')
+        .json({
+          error: true,
+          isError: true,
+          agent: 'System',
+          code: 'SYSTEM_UNAVAILABLE',
+          message: 'MaxEvo system components are not available'
+        })
     }
     
     // Simulate processing delay
