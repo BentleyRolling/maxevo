@@ -56,56 +56,64 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - match expanded menu structure exactly
+    // Collapsed sidebar - simplified and centered
     return (
-      <div className="h-full bg-[#171717] text-white flex flex-col">
-        {/* Header with logo - clickable to expand */}
-        <div className="p-4">
-          <div className="flex items-center justify-center mb-4">
-            <button 
-              onClick={toggleSidebar}
-              className="p-2 hover:bg-[#212121] rounded transition-colors"
-            >
-              <img src="/maxevo-logo.png" alt="MaxEvo" className="h-8 w-auto" />
-            </button>
-          </div>
+      <div className="h-full bg-[#171717] text-white flex flex-col items-center py-4">
+        {/* Logo - clickable to expand */}
+        <button 
+          onClick={toggleSidebar}
+          className="mb-6 p-2 hover:bg-[#212121] rounded transition-colors"
+        >
+          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-6" />
+        </button>
+        
+        {/* Menu items */}
+        <div className="space-y-3 mb-auto">
+          <button 
+            onClick={() => setCurrentView('chats')}
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="Chats"
+          >
+            <MessageSquare className="w-5 h-5" />
+          </button>
           
-          {/* Menu items in same order as expanded */}
-          <div className="space-y-2">
-            <button 
-              onClick={() => setCurrentView('chats')}
-              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
-            >
-              <MessageSquare className="w-4 h-4" />
-            </button>
-            
-            <button 
-              onClick={() => setCurrentView('projects')}
-              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
-            >
-              <Folder className="w-4 h-4" />
-            </button>
-            
-            <button 
-              onClick={handleNewChat}
-              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-            
-            <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
-              <Search className="w-4 h-4" />
-            </button>
-          </div>
+          <button 
+            onClick={() => setCurrentView('projects')}
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="Projects"
+          >
+            <Folder className="w-5 h-5" />
+          </button>
+          
+          <button 
+            onClick={handleNewChat}
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="New chat"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+          
+          <button 
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="Search chats"
+          >
+            <Search className="w-5 h-5" />
+          </button>
         </div>
         
         {/* Footer icons */}
-        <div className="mt-auto p-4 space-y-2">
-          <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
-            <User className="w-4 h-4" />
+        <div className="space-y-3">
+          <button 
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="Account"
+          >
+            <User className="w-5 h-5" />
           </button>
-          <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
-            <Settings className="w-4 h-4" />
+          <button 
+            className="p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title="Settings"
+          >
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </div>

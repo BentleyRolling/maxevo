@@ -129,7 +129,7 @@ const ChatInterface = () => {
   return (
     <div className="flex h-screen w-full">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-12'} transition-all duration-200 overflow-hidden bg-[#171717] flex-shrink-0`}>
+      <div className={`${sidebarOpen ? 'w-64' : 'w-16'} transition-all duration-200 overflow-hidden bg-[#171717] flex-shrink-0`}>
         <Sidebar />
       </div>
       
