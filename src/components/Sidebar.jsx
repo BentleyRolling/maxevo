@@ -46,8 +46,8 @@ const Sidebar = () => {
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
       {/* Header - ChatGPT Style Fixed Logo Positioning */}
-      <div className="pb-2 pt-4">
-        <div className="flex items-center mb-6 mx-2">
+      <div className="px-2 pt-4 pb-2">
+        <div className="flex items-center h-12 mb-4">
           {/* Fixed width container for logo - always centered in its column */}
           <div className="w-12 flex justify-center flex-shrink-0">
             <img 
@@ -59,7 +59,7 @@ const Sidebar = () => {
           </div>
           {/* Hamburger menu appears to the right when expanded */}
           {sidebarOpen && (
-            <div className="flex-1 flex justify-end">
+            <div className="flex-1 flex justify-end pr-2">
               <button 
                 onClick={toggleSidebar}
                 className="p-2 hover:bg-[#212121] rounded transition-colors"
@@ -74,12 +74,12 @@ const Sidebar = () => {
       </div>
 
       {/* Menu Items - ChatGPT Style Fixed Icon Positioning */}
-      <div className="pb-4">
+      <div className="px-2 pb-4">
         {menuItems.map((item, index) => (
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full flex items-center py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded mx-2 transition-colors"
+            className="w-full flex items-center py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             {/* Fixed width container for icon - always centered */}
@@ -121,11 +121,11 @@ const Sidebar = () => {
       )}
       
       {/* Footer - ChatGPT Style Fixed Icon Positioning */}
-      <div className="pt-2 mt-auto pb-4">
+      <div className="px-2 pt-2 mt-auto pb-4">
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full flex items-center py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded mx-2 transition-colors"
+            className="w-full flex items-center py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             {/* Fixed width container for icon - always centered */}
