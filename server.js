@@ -139,6 +139,18 @@ app.get('/health', (req, res) => {
   })
 })
 
+// Debug endpoint to verify deployments
+app.get('/__whoami', (req, res) => {
+  res.json({
+    server: 'root-server.js',
+    timestamp: new Date().toISOString(),
+    nodeEnv: NODE_ENV,
+    port: PORT,
+    pid: process.pid,
+    uptime: process.uptime()
+  })
+})
+
 // Chat endpoint with deadline pattern
 app.post('/api/chat', async (req, res) => {
   const DEADLINE_MS = 25000 // 25 second hard deadline
@@ -266,7 +278,7 @@ async function processAsyncChat(chatId, message, context, jobId) {
     
     // Send to all connected WebSocket clients
     wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
+      if (client.readyState === 1) { // WebSocket.OPEN = 1
         client.send(JSON.stringify(message_data))
       }
     })
@@ -290,7 +302,7 @@ async function processAsyncChat(chatId, message, context, jobId) {
     }
     
     wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
+      if (client.readyState === 1) { // WebSocket.OPEN = 1
         client.send(JSON.stringify(error_data))
       }
     })
