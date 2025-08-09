@@ -47,7 +47,7 @@ const Sidebar = () => {
     <div className="h-full bg-[#171717] text-white flex flex-col">
       {/* Header */}
       <div className="p-4 pb-2">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-center mb-6 relative">
           <img 
             src="/maxevo-logo.png" 
             alt="MaxEvo" 
@@ -57,7 +57,7 @@ const Sidebar = () => {
           {sidebarOpen && (
             <button 
               onClick={toggleSidebar}
-              className="p-2 hover:bg-[#212121] rounded transition-colors"
+              className="absolute right-0 p-2 hover:bg-[#212121] rounded transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -73,7 +73,7 @@ const Sidebar = () => {
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full flex items-center gap-3 px-1 py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center justify-center gap-3 py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -115,7 +115,7 @@ const Sidebar = () => {
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full flex items-center gap-3 px-1 py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center justify-center gap-3 py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
             <item.icon className="w-5 h-5 flex-shrink-0" />
