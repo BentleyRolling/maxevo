@@ -1,5 +1,6 @@
 const OpenAI = require('openai')
 const Anthropic = require('@anthropic-ai/sdk')
+const WebSearchService = require('./WebSearchService')
 
 /**
  * MaxEvoAgentRouter - Intelligent routing system for AI agents
@@ -17,11 +18,13 @@ class MaxEvoAgentRouter {
     
     this.agents = new Map()
     this.routingRules = new Map()
+    this.webSearchService = new WebSearchService()
     this.stats = {
       totalRequests: 0,
       successfulRoutes: 0,
       failedRoutes: 0,
-      agentUsage: {}
+      agentUsage: {},
+      webSearches: 0
     }
     
     this.initialized = false
@@ -172,6 +175,30 @@ class MaxEvoAgentRouter {
     try {
       this.stats.totalRequests++
       
+      // Check if task needs web search
+      const needsWebSearch = this.webSearchService.needsWebSearch(task.content)
+      let webSearchResults = null
+      
+      if (needsWebSearch && this.webSearchService.isAvailable()) {
+        console.log(`🌐 Task requires web search: "${task.content}"`)
+        try {
+          webSearchResults = await this.webSearchService.searchAndScrape(task.content, {
+            maxResults: 3,
+            maxContentLength: 3000
+          })
+          this.stats.webSearches++
+          console.log(`✅ Web search completed: ${webSearchResults.summary}`)
+        } catch (webError) {
+          console.warn('⚠️ Web search failed, proceeding without:', webError.message)
+        }
+      }
+      
+      // Enhance task with web search results if available
+      if (webSearchResults) {
+        task.webSearchResults = webSearchResults
+        task.content = this.enhancePromptWithWebResults(task.content, webSearchResults)
+      }
+      
       // Determine the best agent for this task
       const agentChoice = this.selectAgent(task)
       const agent = agentChoice.agent
@@ -194,6 +221,12 @@ class MaxEvoAgentRouter {
         const error = new Error(`Selected agent "${agent}" is not available`)
         error.code = 'AGENT_UNAVAILABLE'
         throw error
+      }
+      
+      // Add web search info to result
+      if (webSearchResults) {
+        result.webSearchUsed = true
+        result.webSearchSummary = webSearchResults.summary
       }
       
       // Update stats
@@ -300,13 +333,17 @@ class MaxEvoAgentRouter {
   async executeWithClaude(task, model) {
     const anthropic = this.agents.get('anthropic')
     
+    const systemPrompt = this.getSystemPromptForClaude(task)
+    const userPrompt = this.formatPromptForClaude(task)
+    
     const response = await anthropic.messages.create({
       model: model,
       max_tokens: 4096,
+      system: systemPrompt,
       messages: [
         {
           role: 'user',
-          content: this.formatPromptForClaude(task)
+          content: userPrompt
         }
       ]
     })
@@ -326,12 +363,14 @@ class MaxEvoAgentRouter {
   async executeWithOpenAI(task, model) {
     const openai = this.agents.get('openai')
     
+    const systemPrompt = this.getSystemPromptForOpenAI(task)
+    
     const response = await openai.chat.completions.create({
       model: model,
       messages: [
         {
           role: 'system',
-          content: 'You are MaxEvo, an advanced AI orchestration assistant. Provide helpful, accurate, and detailed responses.'
+          content: systemPrompt
         },
         {
           role: 'user',
@@ -400,10 +439,80 @@ class MaxEvoAgentRouter {
   }
 
   /**
+   * Enhance prompt with web search results
+   */
+  enhancePromptWithWebResults(originalPrompt, webResults) {
+    if (!webResults || !webResults.scrapedContent || webResults.scrapedContent.length === 0) {
+      return originalPrompt
+    }
+
+    let enhancement = `\n\n--- CURRENT WEB SEARCH RESULTS ---\n`
+    enhancement += `Query: "${webResults.query}"\n\n`
+
+    // Add answer box if available
+    if (webResults.answerBox) {
+      enhancement += `Direct Answer: ${webResults.answerBox.answer}\n\n`
+    }
+
+    // Add scraped content
+    webResults.scrapedContent.forEach((content, index) => {
+      enhancement += `[${index + 1}] ${content.title}\n`
+      enhancement += `URL: ${content.url}\n`
+      enhancement += `Content: ${content.content.substring(0, 1000)}...\n\n`
+    })
+
+    enhancement += `--- END WEB SEARCH RESULTS ---\n\n`
+    enhancement += `Original question: ${originalPrompt}`
+
+    return enhancement
+  }
+
+  /**
+   * Get system prompt for OpenAI with capabilities
+   */
+  getSystemPromptForOpenAI(task) {
+    let basePrompt = 'You are MaxEvo, an advanced AI orchestration assistant with real-time web access capabilities.'
+    
+    const capabilities = []
+    if (this.webSearchService.isAvailable()) {
+      capabilities.push('web search')
+    }
+    if (this.webSearchService.isScrapingAvailable()) {
+      capabilities.push('web content scraping')
+    }
+
+    if (capabilities.length > 0) {
+      basePrompt += ` You have access to: ${capabilities.join(', ')}.`
+    }
+
+    if (task.webSearchResults) {
+      basePrompt += ' I have already searched the web for current information related to this query. Use this information along with your knowledge to provide the most accurate and up-to-date response.'
+    }
+
+    basePrompt += ' Provide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
+
+    return basePrompt
+  }
+
+  /**
+   * Get system prompt for Claude with capabilities
+   */
+  getSystemPromptForClaude(task) {
+    return this.getSystemPromptForOpenAI(task) // Same for now
+  }
+
+  /**
    * Health check
    */
   isHealthy() {
     return this.initialized && this.agents.size > 0
+  }
+
+  /**
+   * Get web search service status
+   */
+  getWebSearchStatus() {
+    return this.webSearchService.getStatus()
   }
 }
 
