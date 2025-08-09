@@ -82,7 +82,10 @@ const Sidebar = () => {
       {/* Header - ChatGPT Style with larger logo and more padding */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-8 w-auto" />
+          <div className="flex items-center gap-2">
+            <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
+            <span className="text-lg font-medium text-white">MaxEvo</span>
+          </div>
           <button 
             onClick={toggleSidebar}
             className="p-2 hover:bg-[#212121] rounded transition-colors"
