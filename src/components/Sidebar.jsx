@@ -25,214 +25,103 @@ const Sidebar = () => {
     setCurrentView
   } = useMaxEvoStore()
   
-  const [editingChat, setEditingChat] = useState(null)
-  const [editName, setEditName] = useState('')
-  
   const handleNewChat = () => {
     const chatId = createChat('New chat')
     setCurrentChat(chatId)
   }
-  
-  const handleChatSelect = (chatId) => {
-    setCurrentChat(chatId)
-  }
-  
-  const handleDeleteChat = (chatId, e) => {
-    e.stopPropagation()
-    if (Object.keys(chats).length > 1) {
-      deleteChat(chatId)
-    }
-  }
-  
-  const startEditing = (chatId, currentName, e) => {
-    e.stopPropagation()
-    setEditingChat(chatId)
-    setEditName(currentName)
-  }
-  
-  const finishEditing = () => {
-    setEditingChat(null)
-    setEditName('')
-  }
-  
-  if (!sidebarOpen) {
-    // Collapsed sidebar - EXACTLY like ChatGPT: same LEFT positions, just no text
-    return (
-      <div className="h-full bg-[#171717] text-white flex flex-col">
-        {/* Header - EXACT same LEFT position as expanded */}
-        <div className="p-4">
-          <div className="flex items-center mb-4">
-            <button 
-              onClick={toggleSidebar}
-              className="hover:bg-[#212121] rounded transition-colors p-1"
-              title="Expand sidebar"
-            >
-              <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
-            </button>
-          </div>
-          
-          {/* Menu items - LEFT-aligned like expanded, just no text */}
-          <div className="space-y-2 mb-6">
-            <button 
-              onClick={() => setCurrentView('chats')}
-              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-              title="Chats"
-            >
-              <MessageSquare className="w-5 h-5" />
-            </button>
-            
-            <button 
-              onClick={() => setCurrentView('projects')}
-              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-              title="Projects"
-            >
-              <Folder className="w-5 h-5" />
-            </button>
-            
-            <button 
-              onClick={handleNewChat}
-              className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-              title="New chat"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-            
-            <button className="w-full flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-              title="Search chats"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Footer - LEFT-aligned like expanded */}
-        <div className="p-4 mt-auto">
-          <div className="flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-            <User className="w-5 h-5" />
-          </div>
-          <div className="flex items-center px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-            <Settings className="w-5 h-5" />
-          </div>
-        </div>
-      </div>
-    )
-  }
+
+  // Simplified menu structure - same layout for both states
+  const menuItems = [
+    { icon: MessageSquare, label: 'Chats', onClick: () => setCurrentView('chats') },
+    { icon: Folder, label: 'Projects', onClick: () => setCurrentView('projects') },
+    { icon: Plus, label: 'New chat', onClick: handleNewChat },
+    { icon: Search, label: 'Search chats', onClick: () => {} }
+  ]
+
+  const footerItems = [
+    { icon: User, label: 'Account' },
+    { icon: Settings, label: 'Settings' }
+  ]
 
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
-      {/* Header - LEFT-aligned like ChatGPT */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
-          <button 
-            onClick={toggleSidebar}
-            className="p-2 hover:bg-[#212121] rounded transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
-          </button>
-        </div>
-        
-        {/* Menu items - LEFT-aligned like ChatGPT */}
-        <div className="space-y-2 mb-6">
-          <button 
-            onClick={() => setCurrentView('chats')}
-            className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-          >
-            <MessageSquare className="w-5 h-5" />
-            Chats
-          </button>
-          
-          <button 
-            onClick={() => setCurrentView('projects')}
-            className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-          >
-            <Folder className="w-5 h-5" />
-            Projects
-          </button>
-          
-          <button 
-            onClick={handleNewChat}
-            className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            New chat
-          </button>
-          
-          <button className="w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded transition-colors">
-            <Search className="w-5 h-5" />
-            Search chats
-          </button>
+      {/* Header */}
+      <div className="p-4 pb-2">
+        <div className="flex items-center justify-between mb-6">
+          <img 
+            src="/maxevo-logo.png" 
+            alt="MaxEvo" 
+            className="h-8 w-auto cursor-pointer" 
+            onClick={sidebarOpen ? undefined : toggleSidebar}
+          />
+          {sidebarOpen && (
+            <button 
+              onClick={toggleSidebar}
+              className="p-2 hover:bg-[#212121] rounded transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+              </svg>
+            </button>
+          )}
         </div>
       </div>
-      
-      {/* Chats Section */}
-      <div className="flex-1 overflow-y-auto px-4">
-        <div className="text-xs text-gray-500 uppercase tracking-wider mb-2 px-3">Chats</div>
-        <div className="space-y-2">
-          {Object.entries(chats)
-            .sort(([,a], [,b]) => new Date(b.createdAt) - new Date(a.createdAt))
-            .map(([chatId, chat]) => (
-            <div
-              key={chatId}
-              onClick={() => handleChatSelect(chatId)}
-              className={`group relative flex items-center gap-3 px-3 py-3 text-sm rounded cursor-pointer transition-colors ${
-                currentChatId === chatId 
-                  ? 'bg-[#212121] text-white' 
-                  : 'text-gray-300 hover:bg-[#212121]'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 flex-shrink-0" />
-              
-              {editingChat === chatId ? (
-                <input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onBlur={finishEditing}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') finishEditing()
-                    if (e.key === 'Escape') finishEditing()
-                  }}
-                  className="flex-1 bg-transparent border-none outline-none text-white"
-                  autoFocus
-                />
-              ) : (
-                <span className="flex-1 truncate">
+
+      {/* Menu Items */}
+      <div className="px-4 pb-4">
+        {menuItems.map((item, index) => (
+          <button
+            key={index}
+            onClick={item.onClick}
+            className="w-full flex items-center gap-3 p-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title={!sidebarOpen ? item.label : undefined}
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm">{item.label}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Chat List - only show when expanded */}
+      {sidebarOpen && (
+        <div className="flex-1 overflow-y-auto px-4">
+          <div className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-3">Recent Chats</div>
+          <div className="space-y-1">
+            {Object.entries(chats)
+              .sort(([,a], [,b]) => new Date(b.createdAt) - new Date(a.createdAt))
+              .slice(0, 10)
+              .map(([chatId, chat]) => (
+              <button
+                key={chatId}
+                onClick={() => setCurrentChat(chatId)}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded transition-colors ${
+                  currentChatId === chatId 
+                    ? 'bg-[#212121] text-white' 
+                    : 'text-gray-400 hover:bg-[#212121] hover:text-gray-300'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                <span className="flex-1 truncate text-left">
                   {chat.title || 'New chat'}
                 </span>
-              )}
-              
-              {/* Hover Actions */}
-              <div className="absolute right-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={(e) => startEditing(chatId, chat.title || 'New chat', e)}
-                  className="p-1 hover:bg-[#212121] rounded"
-                >
-                  <Edit3 className="w-3 h-3" />
-                </button>
-                <button
-                  onClick={(e) => handleDeleteChat(chatId, e)}
-                  className="p-1 hover:bg-[#212121] rounded text-red-400"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       
-      {/* Footer - SAME structure as collapsed */}
-      <div className="p-4 mt-auto">
-        <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-          <User className="w-5 h-5" />
-          <span>Account</span>
-        </div>
-        <div className="flex items-center gap-3 px-3 py-3 text-sm text-gray-300 hover:bg-[#212121] rounded cursor-pointer transition-colors">
-          <Settings className="w-5 h-5" />
-          <span>Settings</span>
-        </div>
+      {/* Footer */}
+      <div className="p-4 pt-2 mt-auto">
+        {footerItems.map((item, index) => (
+          <button
+            key={index}
+            className="w-full flex items-center gap-3 p-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            title={!sidebarOpen ? item.label : undefined}
+          >
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            {sidebarOpen && <span className="text-sm">{item.label}</span>}
+          </button>
+        ))}
       </div>
     </div>
   )
