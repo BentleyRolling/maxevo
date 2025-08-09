@@ -489,7 +489,7 @@ class MaxEvoAgentRouter {
       basePrompt += ' I have already searched the web for current information related to this query. Use this information along with your knowledge to provide the most accurate and up-to-date response.'
     }
 
-    basePrompt += ' Provide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
+    basePrompt += ' Format your responses with proper structure using:\n- Bullet points for lists\n- Numbered lists for steps or rankings\n- Bold text for **important points**\n- Line breaks for readability\n- Clear sections with headers when appropriate\n\nProvide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
 
     return basePrompt
   }
