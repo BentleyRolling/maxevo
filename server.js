@@ -22,6 +22,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development'
 // Initialize MaxEvo components
 let maxevoInitializer = null
 let maxevoComponents = null
+let maxevoStatus = 'initializing' // 'initializing' | 'ready' | 'failed'
 
 // Middleware
 app.use(cors({
@@ -42,29 +43,42 @@ if (NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')))
 }
 
-// Initialize MaxEvo system
+// Initialize MaxEvo system with timeout
 async function initializeMaxEvo() {
   try {
-    console.log('🚀 Initializing MaxEvo system...')
+    console.log('🚀 Starting MaxEvo initialization (with 30s timeout)...')
+    maxevoStatus = 'initializing'
     
-    // Initialize the real MaxEvo orchestration system
-    maxevoInitializer = new MaxEvoInitializer({
-      enableMemory: true,
-      enableScheduler: true,
-      enableAgentRouter: true,
-      memoryPath: path.join(__dirname, 'data', 'memory')
-    })
+    const initPromise = (async () => {
+      // Initialize the real MaxEvo orchestration system
+      maxevoInitializer = new MaxEvoInitializer({
+        enableMemory: true,
+        enableScheduler: true,
+        enableAgentRouter: true,
+        memoryPath: path.join(__dirname, 'data', 'memory')
+      })
+      
+      // Initialize all components
+      maxevoComponents = await maxevoInitializer.initialize()
+      return true
+    })()
     
-    // Initialize all components
-    maxevoComponents = await maxevoInitializer.initialize()
+    // Race initialization against timeout
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('MaxEvo initialization timeout')), 30000)
+    )
     
-    console.log('🌟 MaxEvo system initialization complete')
+    await Promise.race([initPromise, timeoutPromise])
+    
+    maxevoStatus = 'ready'
+    console.log('✅ MaxEvo system initialization complete')
     
   } catch (error) {
-    console.error('❌ MaxEvo system initialization failed:', error)
-    console.log('⚠️ Falling back to basic system without full MaxEvo orchestration')
+    maxevoStatus = 'failed'
+    console.error('❌ MaxEvo system initialization failed:', error.message)
+    console.log('⚠️ System will run without MaxEvo components')
     
-    // Set fallback null values so the system can still function
+    // Clear failed components
     maxevoInitializer = null
     maxevoComponents = null
   }
@@ -164,8 +178,23 @@ app.post('/api/chat', async (req, res) => {
     
     console.log(`💬 Chat request for ${chatId}: ${message.slice(0, 100)}...`)
     
-    // Check if MaxEvo system is available
-    if (!maxevoInitializer || !maxevoComponents) {
+    // Check MaxEvo system status
+    if (maxevoStatus === 'initializing') {
+      console.log('⏳ MaxEvo system still initializing, returning temp response')
+      return res.json({
+        response: '⏳ **MaxEvo System Initializing**\n\nThe AI orchestration system is still starting up. This typically takes 30-60 seconds.\n\nPlease try your request again in a moment.',
+        agent: 'MaxEvo',
+        taskId: `init_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          executionTime: 100,
+          tokensUsed: 25,
+          systemStatus: 'initializing'
+        }
+      })
+    }
+    
+    if (maxevoStatus === 'failed' || !maxevoInitializer || !maxevoComponents) {
       console.error('❌ MaxEvo system not available')
       return res
         .status(503)
@@ -175,7 +204,7 @@ app.post('/api/chat', async (req, res) => {
           isError: true,
           agent: 'System',
           code: 'SYSTEM_UNAVAILABLE',
-          message: 'MaxEvo system components are not available'
+          message: 'MaxEvo system components failed to initialize'
         })
     }
     
@@ -443,13 +472,10 @@ app.use((error, req, res, next) => {
   })
 })
 
-// Start server
+// Start server (non-blocking initialization)
 async function startServer() {
   try {
-    // Initialize MaxEvo system
-    await initializeMaxEvo()
-    
-    // Start HTTP server
+    // Start HTTP server first
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 MaxEvo UI Server running on port ${PORT}`)
       console.log(`🌍 Environment: ${NODE_ENV}`)
@@ -460,6 +486,11 @@ async function startServer() {
         console.log(`🔗 Frontend dev server: http://localhost:3000`)
         console.log(`🔗 API server: http://localhost:${PORT}`)
       }
+    })
+    
+    // Initialize MaxEvo system in background (don't block server start)
+    initializeMaxEvo().catch(error => {
+      console.error('❌ Background MaxEvo initialization failed:', error.message)
     })
     
   } catch (error) {
