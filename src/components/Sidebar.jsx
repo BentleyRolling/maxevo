@@ -67,24 +67,21 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Menu Items */}
-      <div className="px-4 pb-4">
+      {/* Menu Items - ChatGPT Style Fixed Icon Positioning */}
+      <div className="pb-4">
         {menuItems.map((item, index) => (
           <button
             key={index}
             onClick={item.onClick}
-            className="w-full relative py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center py-3 mb-2 text-gray-300 hover:bg-[#212121] rounded mx-2 transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+            {/* Fixed width container for icon - always centered */}
+            <div className="w-12 flex justify-center flex-shrink-0">
               <item.icon className="w-5 h-5" />
             </div>
-            {sidebarOpen && (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 mr-3 opacity-0"></div>
-                <span className="text-sm">{item.label}</span>
-              </div>
-            )}
+            {/* Text appears to the right when expanded */}
+            {sidebarOpen && <span className="text-sm ml-1 flex-1 text-left">{item.label}</span>}
           </button>
         ))}
       </div>
@@ -117,23 +114,20 @@ const Sidebar = () => {
         </div>
       )}
       
-      {/* Footer */}
-      <div className="p-4 pt-2 mt-auto">
+      {/* Footer - ChatGPT Style Fixed Icon Positioning */}
+      <div className="pt-2 mt-auto pb-4">
         {footerItems.map((item, index) => (
           <button
             key={index}
-            className="w-full relative py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            className="w-full flex items-center py-3 mb-1 text-gray-300 hover:bg-[#212121] rounded mx-2 transition-colors"
             title={!sidebarOpen ? item.label : undefined}
           >
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
+            {/* Fixed width container for icon - always centered */}
+            <div className="w-12 flex justify-center flex-shrink-0">
               <item.icon className="w-5 h-5" />
             </div>
-            {sidebarOpen && (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 mr-3 opacity-0"></div>
-                <span className="text-sm">{item.label}</span>
-              </div>
-            )}
+            {/* Text appears to the right when expanded */}
+            {sidebarOpen && <span className="text-sm ml-1 flex-1 text-left">{item.label}</span>}
           </button>
         ))}
       </div>
