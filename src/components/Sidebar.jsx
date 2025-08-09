@@ -56,32 +56,56 @@ const Sidebar = () => {
   }
   
   if (!sidebarOpen) {
-    // Collapsed sidebar - like ChatGPT
+    // Collapsed sidebar - match expanded menu structure exactly
     return (
-      <div className="h-full bg-[#171717] text-white flex flex-col items-center py-4">
-        {/* Logo - clickable to expand */}
-        <button 
-          onClick={toggleSidebar}
-          className="mb-4 p-2 hover:bg-[#212121] rounded-md transition-colors"
-        >
-          <img src="/maxevo-logo.png" alt="MaxEvo" className="h-6 w-auto" />
-        </button>
+      <div className="h-full bg-[#171717] text-white flex flex-col">
+        {/* Header with logo - clickable to expand */}
+        <div className="p-4">
+          <div className="flex items-center justify-center mb-4">
+            <button 
+              onClick={toggleSidebar}
+              className="p-2 hover:bg-[#212121] rounded transition-colors"
+            >
+              <img src="/maxevo-logo.png" alt="MaxEvo" className="h-8 w-auto" />
+            </button>
+          </div>
+          
+          {/* Menu items in same order as expanded */}
+          <div className="space-y-2">
+            <button 
+              onClick={() => setCurrentView('chats')}
+              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
+            
+            <button 
+              onClick={() => setCurrentView('projects')}
+              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            >
+              <Folder className="w-4 h-4" />
+            </button>
+            
+            <button 
+              onClick={handleNewChat}
+              className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+            
+            <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
         
-        {/* New chat button */}
-        <button 
-          onClick={handleNewChat}
-          className="mb-4 p-2 hover:bg-[#212121] rounded-md transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-        
-        {/* Menu item icons */}
-        <div className="space-y-2">
-          <button className="p-2 hover:bg-[#212121] rounded-md transition-colors">
-            <MessageSquare className="w-5 h-5" />
+        {/* Footer icons */}
+        <div className="mt-auto p-4 space-y-2">
+          <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
+            <User className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-[#212121] rounded-md transition-colors">
-            <Folder className="w-5 h-5" />
+          <button className="w-full flex items-center justify-center p-2 text-gray-300 hover:bg-[#212121] rounded transition-colors">
+            <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>
