@@ -32,7 +32,18 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
                 ) : (
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
-                    className="prose prose-sm prose-headings:text-white prose-p:text-white prose-strong:text-white prose-code:text-white prose-pre:bg-gray-800 prose-pre:text-white prose-a:text-blue-400"
+                    className="prose prose-sm max-w-none
+                      prose-headings:text-white prose-headings:font-semibold prose-headings:mb-3
+                      prose-p:text-white prose-p:leading-relaxed prose-p:mb-4
+                      prose-strong:text-white prose-strong:font-bold
+                      prose-ul:text-white prose-ul:mb-4 prose-ul:list-disc prose-ul:pl-6
+                      prose-ol:text-white prose-ol:mb-4 prose-ol:list-decimal prose-ol:pl-6
+                      prose-li:text-white prose-li:mb-2 prose-li:leading-relaxed
+                      prose-code:text-green-400 prose-code:bg-gray-800 prose-code:px-1 prose-code:rounded
+                      prose-pre:bg-gray-800 prose-pre:text-white prose-pre:rounded-lg prose-pre:p-4
+                      prose-a:text-blue-400 prose-a:hover:text-blue-300
+                      prose-blockquote:text-gray-300 prose-blockquote:border-gray-600
+                      prose-hr:border-gray-600"
                   >
                     {message.content}
                   </ReactMarkdown>
