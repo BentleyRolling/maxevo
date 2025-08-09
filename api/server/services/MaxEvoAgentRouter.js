@@ -1,6 +1,7 @@
 const OpenAI = require('openai')
 const Anthropic = require('@anthropic-ai/sdk')
 const WebSearchService = require('./WebSearchService')
+const DeepDiveEngine = require('./DeepDiveEngine')
 
 /**
  * MaxEvoAgentRouter - Intelligent routing system for AI agents
@@ -19,12 +20,14 @@ class MaxEvoAgentRouter {
     this.agents = new Map()
     this.routingRules = new Map()
     this.webSearchService = new WebSearchService()
+    this.deepDiveEngine = new DeepDiveEngine(this.webSearchService)
     this.stats = {
       totalRequests: 0,
       successfulRoutes: 0,
       failedRoutes: 0,
       agentUsage: {},
-      webSearches: 0
+      webSearches: 0,
+      deepDiveProcessed: 0
     }
     
     this.initialized = false
@@ -169,69 +172,80 @@ class MaxEvoAgentRouter {
   }
 
   /**
-   * Route a task to the most appropriate agent
+   * Route a task to the most appropriate agent with Deep Dive processing
    */
   async routeTask(task) {
     try {
       this.stats.totalRequests++
       
-      // Check if task needs web search
-      const needsWebSearch = this.webSearchService.needsWebSearch(task.content)
-      let webSearchResults = null
+      // Step 1: Process through Deep Dive Engine
+      console.log('🚀 Processing with Universal Answer Formatter...')
+      const deepDiveResult = await this.deepDiveEngine.processQuestion(
+        task.content, 
+        task.context || []
+      )
       
-      if (needsWebSearch && this.webSearchService.isAvailable()) {
-        console.log(`🌐 Task requires web search: "${task.content}"`)
-        try {
-          webSearchResults = await this.webSearchService.searchAndScrape(task.content, {
-            maxResults: 3,
-            maxContentLength: 3000
-          })
-          this.stats.webSearches++
-          console.log(`✅ Web search completed: ${webSearchResults.summary}`)
-        } catch (webError) {
-          console.warn('⚠️ Web search failed, proceeding without:', webError.message)
-        }
+      // Use the enhanced task from deep dive processing
+      const enhancedTask = {
+        ...task,
+        ...deepDiveResult.enhancedTask
       }
       
-      // Enhance task with web search results if available
-      if (webSearchResults) {
-        task.webSearchResults = webSearchResults
-        task.content = this.enhancePromptWithWebResults(task.content, webSearchResults)
-      }
+      this.stats.deepDiveProcessed++
       
-      // Determine the best agent for this task
-      const agentChoice = this.selectAgent(task)
+      // Step 2: Determine the best agent for this task
+      const agentChoice = this.selectAgent(enhancedTask)
       const agent = agentChoice.agent
       const model = agentChoice.model
       
-      console.log(`🎯 Routing task ${task.id} to ${agent} (${model})`)
-      console.log(`🔍 Debug - agent: "${agent}", this.agents.has('openai'): ${this.agents.has('openai')}`)
-      console.log(`🔍 Debug - Available agents: [${Array.from(this.agents.keys()).join(', ')}]`)
+      console.log(`🎯 Routing ${deepDiveResult.analysis.type} task to ${agent} (${model})`)
+      console.log(`🔍 Available agents: [${Array.from(this.agents.keys()).join(', ')}]`)
       
-      // Execute the task with the selected agent
+      // Step 3: Execute the task with the selected agent
       let result
-      if (agent === 'anthropic' && this.agents.has('anthropic')) {
-        console.log(`✅ Using Anthropic/Claude`)
-        result = await this.executeWithClaude(task, model)
-      } else if (agent === 'openai' && this.agents.has('openai')) {
-        console.log(`✅ Using OpenAI/GPT`)
-        result = await this.executeWithOpenAI(task, model)
-      } else {
-        // This should not happen if selectAgent works correctly
-        const error = new Error(`Selected agent "${agent}" is not available`)
-        error.code = 'AGENT_UNAVAILABLE'
-        throw error
+      const llmExecutor = async (taskToExecute) => {
+        if (agent === 'anthropic' && this.agents.has('anthropic')) {
+          return await this.executeWithClaude(taskToExecute, model)
+        } else if (agent === 'openai' && this.agents.has('openai')) {
+          return await this.executeWithOpenAI(taskToExecute, model)
+        } else {
+          const error = new Error(`Selected agent "${agent}" is not available`)
+          error.code = 'AGENT_UNAVAILABLE'
+          throw error
+        }
       }
       
-      // Add web search info to result
-      if (webSearchResults) {
+      // Execute initial response
+      console.log(`✅ Using ${agent === 'anthropic' ? 'Anthropic/Claude' : 'OpenAI/GPT'}`)
+      result = await llmExecutor(enhancedTask)
+      
+      // Step 4: Validate and enhance response
+      const validationResult = await this.deepDiveEngine.validateAndEnhanceResponse(
+        result.response,
+        enhancedTask,
+        llmExecutor
+      )
+      
+      // Update result with validated response
+      result.response = validationResult.response
+      result.qualityScore = validationResult.validation.score
+      result.rewriteAttempts = validationResult.rewriteAttempts
+      
+      // Add metadata
+      if (deepDiveResult.webSearchResults) {
         result.webSearchUsed = true
-        result.webSearchSummary = webSearchResults.summary
+        result.webSearchSummary = deepDiveResult.webSearchResults.summary
+        this.stats.webSearches++
       }
+      
+      result.taskType = deepDiveResult.analysis.type
+      result.confidence = deepDiveResult.analysis.confidence
       
       // Update stats
       this.stats.successfulRoutes++
       this.stats.agentUsage[agent] = (this.stats.agentUsage[agent] || 0) + 1
+      
+      console.log(`✅ Deep Dive completed - Quality Score: ${result.qualityScore}/100`)
       
       return {
         ...result,
@@ -245,7 +259,6 @@ class MaxEvoAgentRouter {
       this.stats.failedRoutes++
       console.error(`❌ Task routing failed for ${task.id}:`, error)
       
-      // Properly throw error instead of masking it
       const routingError = new Error('Agent routing failed')
       routingError.cause = error
       routingError.code = 'PROVIDER_FAILURE'
@@ -440,34 +453,6 @@ class MaxEvoAgentRouter {
     }
   }
 
-  /**
-   * Enhance prompt with web search results
-   */
-  enhancePromptWithWebResults(originalPrompt, webResults) {
-    if (!webResults || !webResults.scrapedContent || webResults.scrapedContent.length === 0) {
-      return originalPrompt
-    }
-
-    let enhancement = `\n\n--- CURRENT WEB SEARCH RESULTS ---\n`
-    enhancement += `Query: "${webResults.query}"\n\n`
-
-    // Add answer box if available
-    if (webResults.answerBox) {
-      enhancement += `Direct Answer: ${webResults.answerBox.answer}\n\n`
-    }
-
-    // Add scraped content
-    webResults.scrapedContent.forEach((content, index) => {
-      enhancement += `[${index + 1}] ${content.title}\n`
-      enhancement += `URL: ${content.url}\n`
-      enhancement += `Content: ${content.content.substring(0, 1000)}...\n\n`
-    })
-
-    enhancement += `--- END WEB SEARCH RESULTS ---\n\n`
-    enhancement += `Original question: ${originalPrompt}`
-
-    return enhancement
-  }
 
   /**
    * Get system prompt for OpenAI with capabilities
@@ -491,7 +476,14 @@ class MaxEvoAgentRouter {
       basePrompt += ' I have already searched the web for current information related to this query. Use this information along with your knowledge to provide the most accurate and up-to-date response.'
     }
 
-    basePrompt += ' Answer in valid GitHub-flavored Markdown only. Use ##/### headings, bullet lists, numbered lists for steps, tables when useful, and fenced code blocks. No HTML.\n\nExample format:\n## Best Headphones Under $200 🎧\n\n### 1) **Audio-Technica ATH-M50xBT2**\n- Wireless • 30-hr battery\n- Balanced, clear sound\n- Solid ANC for the price\n\n### 2) **AKG N60NC** \n- Compact travel fit\n- 15-hr battery\n- Effective noise canceling\n\n> **Takeaway:** Pick ATH-M50xBT2 for all-round; AKG if you travel light.\n\nProvide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
+    // Add formatting instructions based on task type
+    if (task.formattingInstructions) {
+      basePrompt += `\n\n${task.formattingInstructions}`
+    } else {
+      basePrompt += ' Answer in valid GitHub-flavored Markdown with proper structure. Use ## headings, bullet lists, **bold text** for emphasis, and > blockquotes for key takeaways.'
+    }
+    
+    basePrompt += '\n\nProvide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
 
     return basePrompt
   }
