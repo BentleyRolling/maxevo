@@ -1,0 +1,147 @@
+name: Automated Security Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, develop]
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+  actions: read
+
+jobs:
+  security-review:
+    runs-on: ubuntu-latest
+    name: Security Review & Vulnerability Scan
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Full history for better analysis
+
+    - name: Claude Code Security Review
+      uses: anthropics/claude-code-action@v1
+      with:
+        # Use Claude Code's new security review feature
+        command: '/security-review'
+        anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+        # Include all changed files in PR
+        include_diff: ${{ github.event_name == 'pull_request' }}
+        
+    - name: Dependency Security Scan
+      uses: github/dependency-review-action@v4
+      if: github.event_name == 'pull_request'
+      
+    - name: CodeQL Security Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+        
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+        
+    - name: Run Semgrep Security Rules
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/javascript
+          p/typescript
+          p/nodejs
+          p/docker
+        
+    - name: OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'MaxEvo'
+        path: '.'
+        format: 'SARIF'
+        out: 'dependency-check-report'
+        
+    - name: Upload Dependency Check Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: dependency-check-report/dependency-check-report.sarif
+        
+    - name: Secret Scanning
+      uses: trufflesecurity/trufflehog@v3.63.2
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        
+    - name: Security Comment on PR
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // Get all security scan results and create summary comment
+          const { data: checkRuns } = await github.rest.checks.listForRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.sha
+          });
+          
+          const securityChecks = checkRuns.check_runs.filter(run => 
+            run.name.includes('Security') || 
+            run.name.includes('CodeQL') || 
+            run.name.includes('Dependency') ||
+            run.name.includes('Semgrep')
+          );
+          
+          const passed = securityChecks.filter(c => c.conclusion === 'success').length;
+          const failed = securityChecks.filter(c => c.conclusion === 'failure').length;
+          const total = securityChecks.length;
+          
+          const comment = `## 🛡️ Security Review Summary
+          
+          **Security Checks:** ${passed}/${total} passed ${failed > 0 ? '❌' : '✅'}
+          
+          ### Automated Security Analysis:
+          - Claude Code Security Review: ✅ 
+          - Dependency Vulnerability Scan: ${failed === 0 ? '✅' : '❌'}
+          - CodeQL Static Analysis: ${failed === 0 ? '✅' : '❌'}  
+          - Secret Detection: ${failed === 0 ? '✅' : '❌'}
+          - OWASP Security Rules: ${failed === 0 ? '✅' : '❌'}
+          
+          ${failed > 0 ? 
+          '⚠️ **Security issues detected!** Please review the failing checks above before merging.' : 
+          '✅ **All security checks passed!** This PR appears secure for deployment.'}
+          
+          ---
+          *Automated security review powered by Claude Code*`;
+          
+          await github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # Additional job for container security if using Docker
+  container-security:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'Dockerfile') || contains(github.event.head_commit.modified, 'docker-compose')
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Docker Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'maxevo:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy Scan Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'

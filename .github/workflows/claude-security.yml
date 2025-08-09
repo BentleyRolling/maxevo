@@ -1,0 +1,77 @@
+name: Claude Code Security Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  claude-security-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: Claude Code Security Review
+      run: |
+        # Install Claude Code CLI if not available
+        if ! command -v claude &> /dev/null; then
+          curl -fsSL https://claude.ai/install.sh | sh
+        fi
+        
+        # Run security review on changed files
+        echo "🔍 Running Claude Code security review..."
+        
+        # Get list of changed files in the PR
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD | tr '\n' ' ')
+          echo "Changed files: $CHANGED_FILES"
+        fi
+        
+        # Run the security review
+        claude /security-review
+        
+        # Save output to file for PR comment
+        claude /security-review > security-review-output.md 2>&1 || true
+        
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+    - name: Comment Security Review on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          let reviewOutput = '## 🔐 Claude Code Security Review\n\n';
+          
+          try {
+            const output = fs.readFileSync('security-review-output.md', 'utf8');
+            reviewOutput += output;
+          } catch (error) {
+            reviewOutput += '⚠️ Security review output not available. Check the action logs for details.\n\n';
+            reviewOutput += `Error: ${error.message}`;
+          }
+          
+          reviewOutput += '\n\n---\n*Automated security review by Claude Code*';
+          
+          // Post comment on PR
+          await github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: reviewOutput
+          });
+
+    - name: Upload Security Review Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: claude-security-review
+        path: security-review-output.md
