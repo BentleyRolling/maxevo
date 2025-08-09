@@ -58,21 +58,42 @@ class MaxEvoAgentRouter {
    * Initialize AI service clients
    */
   async initializeAIClients() {
+    console.log('🔍 DEBUG: Checking environment variables...')
+    console.log('🔍 DEBUG: OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY)
+    console.log('🔍 DEBUG: ANTHROPIC_API_KEY exists:', !!process.env.ANTHROPIC_API_KEY)
+    console.log('🔍 DEBUG: NODE_ENV:', process.env.NODE_ENV)
+    
     // OpenAI client
     if (process.env.OPENAI_API_KEY) {
-      this.agents.set('openai', new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
-      }))
-      console.log('✅ OpenAI client initialized')
+      try {
+        this.agents.set('openai', new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY
+        }))
+        console.log('✅ OpenAI client initialized successfully')
+      } catch (error) {
+        console.error('❌ OpenAI client initialization failed:', error.message)
+        throw error
+      }
+    } else {
+      console.log('⚠️ No OPENAI_API_KEY found')
     }
     
     // Anthropic (Claude) client
     if (process.env.ANTHROPIC_API_KEY) {
-      this.agents.set('anthropic', new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY
-      }))
-      console.log('✅ Anthropic (Claude) client initialized')
+      try {
+        this.agents.set('anthropic', new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY
+        }))
+        console.log('✅ Anthropic (Claude) client initialized successfully')
+      } catch (error) {
+        console.error('❌ Anthropic client initialization failed:', error.message)
+        throw error
+      }
+    } else {
+      console.log('⚠️ No ANTHROPIC_API_KEY found')
     }
+    
+    console.log(`🔍 DEBUG: Total agents initialized: ${this.agents.size}`)
     
     if (this.agents.size === 0) {
       const error = new Error('No AI service API keys configured')
