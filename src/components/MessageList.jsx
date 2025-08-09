@@ -6,6 +6,7 @@ import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeHighlight from 'rehype-highlight'
 import CodeBlock from './CodeBlock'
+import { normalizeMarkdown } from '../utils/normalizeMarkdown'
 import { 
   User, 
   Bot,
@@ -62,7 +63,7 @@ const MessageList = ({ messages, isTyping, activeAgent, agentStatus }) => {
                         ),
                       }}
                     >
-                      {message.content}
+                      {normalizeMarkdown(message.content)}
                     </ReactMarkdown>
                   </div>
                 </div>

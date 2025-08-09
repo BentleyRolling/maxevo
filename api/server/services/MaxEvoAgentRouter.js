@@ -339,6 +339,7 @@ class MaxEvoAgentRouter {
     const response = await anthropic.messages.create({
       model: model,
       max_tokens: 4096,
+      temperature: 0.4, // Lower temperature for more structured responses
       system: systemPrompt,
       messages: [
         {
@@ -377,7 +378,8 @@ class MaxEvoAgentRouter {
           content: this.formatPromptForOpenAI(task)
         }
       ],
-      max_tokens: 4096
+      max_tokens: 4096,
+      temperature: 0.4 // Lower temperature for more structured, factual responses
     })
     
     return {
@@ -489,7 +491,7 @@ class MaxEvoAgentRouter {
       basePrompt += ' I have already searched the web for current information related to this query. Use this information along with your knowledge to provide the most accurate and up-to-date response.'
     }
 
-    basePrompt += ' Respond in clean Markdown only. Use headings, lists, code fences, tables, and blockquotes when helpful. No HTML. Provide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
+    basePrompt += ' Answer in valid GitHub-flavored Markdown only. Use ##/### headings, bullet lists, numbered lists for steps, tables when useful, and fenced code blocks. No HTML.\n\nExample format:\n## Best Headphones Under $200 🎧\n\n### 1) **Audio-Technica ATH-M50xBT2**\n- Wireless • 30-hr battery\n- Balanced, clear sound\n- Solid ANC for the price\n\n### 2) **AKG N60NC** \n- Compact travel fit\n- 15-hr battery\n- Effective noise canceling\n\n> **Takeaway:** Pick ATH-M50xBT2 for all-round; AKG if you travel light.\n\nProvide helpful, accurate, and detailed responses. When you use web search results, cite your sources.'
 
     return basePrompt
   }
