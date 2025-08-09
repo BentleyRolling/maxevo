@@ -129,12 +129,20 @@ export const useWebSocket = () => {
         setError(data.error)
         break
         
+      case 'handshake_ack':
+        // Handle handshake acknowledgment
+        console.log('🤝 WebSocket handshake acknowledged')
+        if (data.sessionId) {
+          console.log('Session ID:', data.sessionId)
+        }
+        break
+        
       case 'pong':
         // Handle keepalive pong
         break
         
       default:
-        console.log('Unknown WebSocket message type:', data.type)
+        console.warn('Unknown WebSocket message type:', data.type)
     }
   }
   

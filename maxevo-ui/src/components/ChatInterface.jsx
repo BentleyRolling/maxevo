@@ -71,6 +71,23 @@ const ChatInterface = () => {
       
       const data = await response.json()
       
+      // Check for error responses (even with HTTP 200)
+      if (data.error || data.isError) {
+        console.error('Backend returned error:', data)
+        
+        // Add error message
+        addMessage(currentChatId, {
+          role: 'assistant',
+          content: `⚠️ ${data.message || 'Model failed. Please try again.'}`,
+          agent: data.agent || 'System',
+          error: true,
+          errorCode: data.code
+        })
+        
+        setAgentStatus('error')
+        return
+      }
+      
       // Add AI response
       addMessage(currentChatId, {
         role: 'assistant',

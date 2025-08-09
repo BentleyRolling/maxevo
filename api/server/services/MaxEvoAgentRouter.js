@@ -164,14 +164,12 @@ class MaxEvoAgentRouter {
       this.stats.failedRoutes++
       console.error(`❌ Task routing failed for ${task.id}:`, error)
       
-      // Return error response
-      return {
-        response: 'I apologize, but I encountered an error processing your request. Please try again.',
-        agent: 'MaxEvo Error Handler',
-        taskId: task.id,
-        error: error.message,
-        timestamp: new Date().toISOString()
-      }
+      // Properly throw error instead of masking it
+      const routingError = new Error('Agent routing failed')
+      routingError.cause = error
+      routingError.code = 'PROVIDER_FAILURE'
+      routingError.taskId = task.id
+      throw routingError
     }
   }
 

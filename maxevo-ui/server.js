@@ -3,6 +3,7 @@ const cors = require('cors')
 const WebSocket = require('ws')
 const http = require('http')
 const path = require('path')
+const { v4: uuidv4 } = require('uuid')
 
 // Import our existing MaxEvo services
 const MaxEvoCore = require('../api/server/services/MaxEvoCore')
@@ -85,7 +86,8 @@ async function initializeMaxEvo() {
 
 // WebSocket connection handler
 wss.on('connection', (ws, req) => {
-  console.log('🔌 New WebSocket connection')
+  const sessionId = uuidv4()
+  console.log(`🔌 New WebSocket connection: ${sessionId}`)
   
   // Send initial system status
   const systemStatus = {
@@ -110,6 +112,7 @@ wss.on('connection', (ws, req) => {
         case 'handshake':
           ws.send(JSON.stringify({
             type: 'handshake_ack',
+            sessionId: sessionId,
             timestamp: new Date().toISOString()
           }))
           break
@@ -168,12 +171,13 @@ app.post('/api/chat', async (req, res) => {
     // Simulate agent processing
     let response = ''
     let agent = 'MaxEvo'
-    let taskId = null
+    let taskId = uuidv4()
     
     if (agentRouter && maxevoCore) {
       try {
         // Route the message to appropriate agent
         const routingResult = await agentRouter.routeTask({
+          id: taskId,
           type: 'chat',
           content: message,
           context: context.slice(-5), // Last 5 messages for context
@@ -186,8 +190,19 @@ app.post('/api/chat', async (req, res) => {
         
       } catch (error) {
         console.error('Agent routing error:', error)
-        response = 'I understand your request. Let me help you with that.'
-        agent = 'MaxEvo'
+        
+        // Return proper error instead of masking it
+        return res
+          .status(502)
+          .set('x-maxevo-error', 'PROVIDER_FAILURE')
+          .json({
+            error: true,
+            isError: true,
+            agent: 'MaxEvo',
+            code: 'PROVIDER_FAILURE',
+            message: 'Upstream model call failed',
+            detail: process.env.NODE_ENV === 'production' ? undefined : error.message
+          })
       }
     } else {
       // Fallback responses when MaxEvo components aren't available
@@ -210,9 +225,13 @@ app.post('/api/chat', async (req, res) => {
     
   } catch (error) {
     console.error('Chat API error:', error)
-    res.status(500).json({ 
-      error: 'Failed to process message',
-      details: error.message 
+    res.status(500).json({
+      error: true,
+      isError: true,
+      agent: 'System',
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to process message',
+      detail: process.env.NODE_ENV === 'production' ? undefined : error.message
     })
   }
 })
