@@ -51,7 +51,7 @@ const Sidebar = () => {
           <img 
             src="/maxevo-logo.png" 
             alt="MaxEvo" 
-            className="h-8 w-auto cursor-pointer" 
+            className="h-6 w-auto cursor-pointer" 
             onClick={sidebarOpen ? undefined : toggleSidebar}
           />
           {sidebarOpen && (
