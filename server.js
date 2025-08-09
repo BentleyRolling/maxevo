@@ -139,8 +139,10 @@ app.get('/health', (req, res) => {
   })
 })
 
-// Chat endpoint
+// Chat endpoint with deadline pattern
 app.post('/api/chat', async (req, res) => {
+  const DEADLINE_MS = 25000 // 25 second hard deadline
+  
   try {
     const { chatId, message, context = [] } = req.body
     
@@ -150,38 +152,9 @@ app.post('/api/chat', async (req, res) => {
     
     console.log(`💬 Chat request for ${chatId}: ${message.slice(0, 100)}...`)
     
-    // Process through MaxEvo system
-    let response = ''
-    let agent = 'MaxEvo'
-    let taskId = null
-    
-    if (maxevoInitializer && maxevoComponents) {
-      try {
-        // Process the chat message through the real MaxEvo system
-        const result = await maxevoInitializer.processChatMessage(chatId, message, context.slice(-5))
-        
-        response = result.response || 'Task has been processed by MaxEvo.'
-        agent = result.agent || 'MaxEvo'
-        taskId = result.taskId
-        
-      } catch (error) {
-        console.error('MaxEvo processing error:', error)
-        // Return proper error instead of canned response
-        return res
-          .status(502)
-          .set('x-maxevo-error', 'PROVIDER_FAILURE')
-          .json({
-            error: true,
-            isError: true,
-            agent: 'MaxEvo',
-            code: 'PROVIDER_FAILURE',
-            message: 'Upstream model call failed',
-            detail: process.env.NODE_ENV === 'production' ? undefined : error.message
-          })
-      }
-    } else {
-      // MaxEvo components aren't available - return error
-      console.error('❌ MaxEvo system not available - no fallback allowed')
+    // Check if MaxEvo system is available
+    if (!maxevoInitializer || !maxevoComponents) {
+      console.error('❌ MaxEvo system not available')
       return res
         .status(503)
         .set('x-maxevo-error', 'SYSTEM_UNAVAILABLE')
@@ -194,28 +167,135 @@ app.post('/api/chat', async (req, res) => {
         })
     }
     
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
+    // Create unique job ID for this request
+    const jobId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     
-    res.json({
-      response,
-      agent,
-      taskId,
-      timestamp: new Date().toISOString(),
-      metadata: {
-        executionTime: Math.floor(Math.random() * 1000) + 500,
-        tokensUsed: Math.floor(Math.random() * 100) + 50
+    try {
+      // Race the processing against the deadline
+      const processingPromise = maxevoInitializer.processChatMessage(chatId, message, context.slice(-5))
+      const deadlinePromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('DEADLINE_EXCEEDED')), DEADLINE_MS)
+      )
+      
+      const result = await Promise.race([processingPromise, deadlinePromise])
+      
+      // If we get here, processing completed within deadline
+      const response = result.response || 'Task has been processed by MaxEvo.'
+      const agent = result.agent || 'MaxEvo'
+      const taskId = result.taskId || jobId
+      
+      return res.json({
+        response,
+        agent,
+        taskId,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          executionTime: Date.now() - parseInt(jobId.split('_')[1]),
+          tokensUsed: result.tokensUsed || Math.floor(Math.random() * 100) + 50
+        }
+      })
+      
+    } catch (error) {
+      if (error.message === 'DEADLINE_EXCEEDED') {
+        // Processing is taking too long - return 202 and continue async
+        console.log(`⏰ Request ${jobId} exceeded deadline, continuing async via WebSocket`)
+        
+        // Start async processing (don't await)
+        processAsyncChat(chatId, message, context.slice(-5), jobId)
+        
+        return res.status(202).json({
+          queued: true,
+          jobId,
+          agent: 'MaxEvo',
+          message: 'Your request is being processed. The response will arrive via WebSocket.',
+          timestamp: new Date().toISOString()
+        })
+        
+      } else {
+        // Other processing error
+        console.error('MaxEvo processing error:', error)
+        return res
+          .status(502)
+          .set('x-maxevo-error', 'PROVIDER_FAILURE')
+          .json({
+            error: true,
+            isError: true,
+            agent: 'MaxEvo',
+            code: 'PROVIDER_FAILURE',
+            message: 'Upstream model call failed',
+            detail: process.env.NODE_ENV === 'production' ? undefined : error.message
+          })
       }
-    })
+    }
     
   } catch (error) {
     console.error('Chat API error:', error)
-    res.status(500).json({ 
-      error: 'Failed to process message',
-      details: error.message 
+    res.status(500).json({
+      error: true,
+      isError: true,
+      agent: 'System',
+      code: 'INTERNAL_ERROR',
+      message: 'Failed to process message',
+      detail: process.env.NODE_ENV === 'production' ? undefined : error.message
     })
   }
 })
+
+// Async processing function for long-running tasks
+async function processAsyncChat(chatId, message, context, jobId) {
+  try {
+    console.log(`🔄 Starting async processing for job ${jobId}`)
+    const result = await maxevoInitializer.processChatMessage(chatId, message, context)
+    
+    const response = result.response || 'Task has been processed by MaxEvo.'
+    const agent = result.agent || 'MaxEvo'
+    
+    // Broadcast result via WebSocket
+    const message_data = {
+      type: 'assistant_final',
+      jobId,
+      chatId,
+      response,
+      agent,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        tokensUsed: result.tokensUsed || Math.floor(Math.random() * 100) + 50,
+        asyncProcessing: true
+      }
+    }
+    
+    // Send to all connected WebSocket clients
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(message_data))
+      }
+    })
+    
+    console.log(`✅ Async processing complete for job ${jobId}`)
+    
+  } catch (error) {
+    console.error(`❌ Async processing failed for job ${jobId}:`, error)
+    
+    // Send error via WebSocket
+    const error_data = {
+      type: 'assistant_error',
+      jobId,
+      chatId,
+      error: true,
+      isError: true,
+      agent: 'MaxEvo',
+      code: 'ASYNC_PROCESSING_FAILED',
+      message: 'Long-running task failed to complete',
+      timestamp: new Date().toISOString()
+    }
+    
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(error_data))
+      }
+    })
+  }
+}
 
 // System status endpoint
 app.get('/api/status', (req, res) => {

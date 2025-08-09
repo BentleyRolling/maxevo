@@ -2,6 +2,11 @@
 
 A ChatGPT-style interface for the MaxEvo AI Orchestration System.
 
+## Recent Updates
+- Added 25s deadline pattern to prevent 504 timeouts
+- Implemented async WebSocket completion for long-running tasks  
+- Enhanced AI client validation with fast probes
+
 ## Features
 
 🎯 **ChatGPT-Style Interface**

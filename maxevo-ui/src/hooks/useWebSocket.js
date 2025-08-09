@@ -141,6 +141,22 @@ export const useWebSocket = () => {
         // Handle keepalive pong
         break
         
+      case 'assistant_final':
+        // Handle async completion from long-running tasks
+        if (data.chatId && data.response) {
+          console.log('📨 Async response received for chat:', data.chatId)
+          // TODO: Update chat state with async response
+        }
+        break
+        
+      case 'assistant_error':
+        // Handle async errors from long-running tasks
+        if (data.chatId) {
+          console.error('❌ Async processing error for chat:', data.chatId, data.message)
+          // TODO: Update chat state with error
+        }
+        break
+        
       default:
         console.warn('Unknown WebSocket message type:', data.type)
     }

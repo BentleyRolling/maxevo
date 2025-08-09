@@ -59,35 +59,58 @@ class MaxEvoAgentRouter {
    */
   async initializeAIClients() {
     console.log('🔍 DEBUG: Checking environment variables...')
-    console.log('🔍 DEBUG: OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY)
-    console.log('🔍 DEBUG: ANTHROPIC_API_KEY exists:', !!process.env.ANTHROPIC_API_KEY)
+    console.log('🔍 DEBUG: OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY, 'len:', process.env.OPENAI_API_KEY?.length)
+    console.log('🔍 DEBUG: ANTHROPIC_API_KEY exists:', !!process.env.ANTHROPIC_API_KEY, 'len:', process.env.ANTHROPIC_API_KEY?.length)
     console.log('🔍 DEBUG: NODE_ENV:', process.env.NODE_ENV)
     
-    // OpenAI client
+    // OpenAI client with timeout
     if (process.env.OPENAI_API_KEY) {
       try {
-        this.agents.set('openai', new OpenAI({
+        console.log('🔍 DEBUG: Creating OpenAI client...')
+        const openaiClient = new OpenAI({
           apiKey: process.env.OPENAI_API_KEY
-        }))
-        console.log('✅ OpenAI client initialized successfully')
+        })
+        console.log('🔍 DEBUG: OpenAI client object created, testing with fast probe...')
+        
+        // Quick validation with minimal completion
+        const probePromise = openaiClient.chat.completions.create({
+          model: process.env.OPENAI_FAST_MODEL || 'gpt-4o-mini',
+          messages: [{ role: 'user', content: 'pong' }],
+          max_tokens: 1
+        })
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('OpenAI probe timeout after 2s')), 2000)
+        )
+        
+        await Promise.race([probePromise, timeoutPromise])
+        
+        this.agents.set('openai', openaiClient)
+        console.log('✅ OpenAI client initialized and tested successfully')
       } catch (error) {
-        console.error('❌ OpenAI client initialization failed:', error.message)
-        throw error
+        console.error('❌ OpenAI client initialization/test failed:', error.message)
+        console.error('❌ Error details:', error)
+        // Don't throw - continue with other clients
       }
     } else {
       console.log('⚠️ No OPENAI_API_KEY found')
     }
     
-    // Anthropic (Claude) client
+    // Anthropic (Claude) client with timeout
     if (process.env.ANTHROPIC_API_KEY) {
       try {
-        this.agents.set('anthropic', new Anthropic({
-          apiKey: process.env.ANTHROPIC_API_KEY
-        }))
+        console.log('🔍 DEBUG: Creating Anthropic client...')
+        const anthropicClient = new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY,
+          timeout: 10000 // 10 second timeout
+        })
+        console.log('🔍 DEBUG: Anthropic client object created')
+        
+        this.agents.set('anthropic', anthropicClient)
         console.log('✅ Anthropic (Claude) client initialized successfully')
       } catch (error) {
         console.error('❌ Anthropic client initialization failed:', error.message)
-        throw error
+        console.error('❌ Error details:', error)
+        // Don't throw - continue
       }
     } else {
       console.log('⚠️ No ANTHROPIC_API_KEY found')
@@ -96,7 +119,7 @@ class MaxEvoAgentRouter {
     console.log(`🔍 DEBUG: Total agents initialized: ${this.agents.size}`)
     
     if (this.agents.size === 0) {
-      const error = new Error('No AI service API keys configured')
+      const error = new Error('No AI service API keys configured or all clients failed to initialize')
       error.code = 'MISSING_API_KEYS'
       console.error('❌ No AI service API keys found - system cannot function')
       throw error
