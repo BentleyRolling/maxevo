@@ -45,24 +45,30 @@ const Sidebar = () => {
 
   return (
     <div className="h-full bg-[#171717] text-white flex flex-col">
-      {/* Header */}
-      <div className="p-4 pb-2">
-        <div className="flex items-center justify-center mb-6 relative">
-          <img 
-            src="/maxevo-logo.png" 
-            alt="MaxEvo" 
-            className="h-5 w-auto cursor-pointer" 
-            onClick={sidebarOpen ? undefined : toggleSidebar}
-          />
+      {/* Header - ChatGPT Style Fixed Logo Positioning */}
+      <div className="pb-2 pt-4">
+        <div className="flex items-center mb-6 mx-2">
+          {/* Fixed width container for logo - always centered in its column */}
+          <div className="w-12 flex justify-center flex-shrink-0">
+            <img 
+              src="/maxevo-logo.png" 
+              alt="MaxEvo" 
+              className="h-5 w-auto cursor-pointer" 
+              onClick={sidebarOpen ? undefined : toggleSidebar}
+            />
+          </div>
+          {/* Hamburger menu appears to the right when expanded */}
           {sidebarOpen && (
-            <button 
-              onClick={toggleSidebar}
-              className="absolute right-0 p-2 hover:bg-[#212121] rounded transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-              </svg>
-            </button>
+            <div className="flex-1 flex justify-end">
+              <button 
+                onClick={toggleSidebar}
+                className="p-2 hover:bg-[#212121] rounded transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+              </button>
+            </div>
           )}
         </div>
       </div>
