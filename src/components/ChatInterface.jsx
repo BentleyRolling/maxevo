@@ -272,6 +272,7 @@ const ChatInterface = () => {
                 {hasActiveChat && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121]/80 to-transparent">
                     <div className="px-6 py-4">
+                      {console.log("📦 ChatInterface footer render, thinkingVisible:", thinkingVisible)}
                       <ThinkingIndicator show={thinkingVisible} />
                       <div className="py-2">
                         <ChatInput 

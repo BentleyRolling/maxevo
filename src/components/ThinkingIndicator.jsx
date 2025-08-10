@@ -12,6 +12,11 @@ export default function ThinkingIndicator({ show = false }) {
   const [i, setI] = useState(0);
 
   useEffect(() => {
+    console.log("🧩 ThinkingIndicator mounted")
+  }, []);
+
+  useEffect(() => {
+    console.log("👀 ThinkingIndicator show changed:", show)
     if (!show) return;
     const id = setInterval(() => setI(v => (v + 1) % phrases.length), 1400);
     return () => clearInterval(id);

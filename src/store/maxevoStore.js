@@ -237,26 +237,29 @@ export const useMaxEvoStore = create(
       },
       
       // Thinking Indicator Methods
-      startThinking: (minMs = 800) => {
+      startThinking: (minMs = 900) => {
         const until = Date.now() + minMs
+        console.log("🟢 startThinking()", { minMs, until })
         set({ isTyping: true, thinkingVisible: true, thinkingUntil: until })
       },
 
       stopThinking: () => {
         const until = get().thinkingUntil ?? 0
         const wait = Math.max(0, until - Date.now())
+        console.log("🛑 stopThinking()", { until, wait })
         if (wait <= 0) {
           set({ isTyping: false, thinkingVisible: false, thinkingUntil: null })
         } else {
-          setTimeout(() => 
-            set({ isTyping: false, thinkingVisible: false, thinkingUntil: null }),
-            wait
-          )
+          setTimeout(() => {
+            console.log("⏲️ stopThinking() timeout fired")
+            set({ isTyping: false, thinkingVisible: false, thinkingUntil: null })
+          }, wait)
         }
       },
 
       // Compatibility shim - makes old setTyping() calls use new min-visible logic
       setTyping: (on) => {
+        console.log("🔁 setTyping shim", { on })
         if (on) {
           get().startThinking(900)
         } else {
