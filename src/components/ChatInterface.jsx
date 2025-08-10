@@ -196,7 +196,7 @@ const ChatInterface = () => {
                 
                 {/* Input Area - Only show when there are messages (not on hero screen) */}
                 {hasActiveChat && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0b0b0d] via-[#0b0b0d]/80 to-transparent h-32">
+                  <div className="absolute bottom-0 left-0 right-0 h-32" style={{background: 'linear-gradient(to top, #0b0b0d 0%, rgba(11,11,13,0.8) 40%, transparent 100%)'}}>
                     <div className="px-6 py-6 h-full flex items-end">
                       <ChatInput 
                         onSendMessage={handleSendMessage}
