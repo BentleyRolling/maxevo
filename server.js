@@ -10,6 +10,8 @@ const fs = require('fs')
 
 // Import real MaxEvo services
 const MaxEvoInitializer = require('./api/server/services/initializeMaxEvo')
+const { SYSTEM_PROMPT } = require('./api/server/llm/systemPrompt')
+const { postProcess } = require('./api/server/llm/postProcess')
 
 const app = express()
 const server = http.createServer(app)
@@ -187,7 +189,7 @@ function broadcastResult(jobId, chatId, response, agent = 'MaxEvo') {
     type: 'assistant_final',
     jobId,
     chatId,
-    text: response,
+    text: postProcess(response),
     agent,
     timestamp: new Date().toISOString(),
     metadata: {
@@ -319,7 +321,7 @@ app.post('/api/chat', async (req, res) => {
       const taskId = result.taskId || jobId
       
       return res.json({
-        response,
+        response: postProcess(response),
         agent,
         taskId,
         timestamp: new Date().toISOString(),
@@ -389,7 +391,7 @@ async function processAsyncChat(chatId, message, context, jobId) {
       type: 'assistant_final',
       jobId,
       chatId,
-      response,
+      response: postProcess(response),
       agent,
       timestamp: new Date().toISOString(),
       metadata: {
