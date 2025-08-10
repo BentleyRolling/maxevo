@@ -60,42 +60,72 @@ const HeroChat = ({ chatId, onSend, onPrefill }) => {
             <p className="text-gray-400">I'm MaxEvo, your AI orchestration assistant</p>
           </div>
 
-          {/* Chat Input */}
+          {/* Chat Input - Match expanded input exactly */}
           <div className="w-full max-w-2xl">
-            <div className="relative">
-              <div className="rounded-2xl border border-zinc-700 bg-zinc-800/60 backdrop-blur shadow-sm p-3">
-                <div className="flex items-end gap-3">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(text); }} className="relative">
+              <div className="rounded-3xl bg-[#2f2f2f] shadow-lg">
+                
+                {/* Top Row - Text Input */}
+                <div className="px-4 pt-4 pb-2">
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder="Message MaxEvo..."
-                    rows={1}
-                    className="w-full resize-none bg-transparent outline-none text-white text-base py-2 px-1 placeholder:text-gray-400"
-                    style={{
-                      minHeight: '24px',
-                      maxHeight: '200px',
-                      lineHeight: '24px'
-                    }}
                     onKeyDown={handleKeyDown}
+                    placeholder="Message MaxEvo..."
+                    className="w-full resize-none bg-transparent text-white placeholder-gray-400 focus:outline-none text-base leading-6"
+                    rows={1}
+                    style={{ minHeight: '24px', maxHeight: '200px' }}
                     onInput={(e) => {
-                      // Auto-resize textarea
                       e.target.style.height = 'auto';
                       e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
                     }}
                   />
+                </div>
+                
+                {/* Bottom Row - Tools and Send Button */}
+                <div className="flex items-center justify-between px-4 pb-4">
+                  <div className="flex items-center gap-2">
+                    {/* Attach Button */}
+                    <button
+                      type="button"
+                      className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-600 rounded-lg transition-colors"
+                      title="Attach files"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                    </button>
+                    
+                    {/* Tools Button */}
+                    <button
+                      type="button"
+                      className="p-2 text-gray-400 hover:text-gray-300 hover:bg-gray-600 rounded-lg transition-colors"
+                      title="Tools"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {/* Send Button */}
                   <button
-                    onClick={() => handleSubmit(text)}
+                    type="submit"
                     disabled={!text.trim()}
-                    className="shrink-0 rounded-lg p-2 bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Send message"
+                    className={`p-2 rounded-lg transition-all ${
+                      text.trim()
+                        ? 'bg-white text-black hover:bg-gray-200 shadow-sm'
+                        : 'text-gray-500 cursor-not-allowed'
+                    }`}
+                    title="Send message"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
-                      <path d="m12 19-7-7 7-7m7 7H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(180 12 12)" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l7-7-7-7m7 7H5" />
                     </svg>
                   </button>
                 </div>
               </div>
-            </div>
+            </form>
 
             {/* Action Chips */}
             <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
