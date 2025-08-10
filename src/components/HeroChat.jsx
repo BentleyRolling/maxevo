@@ -51,7 +51,7 @@ const HeroChat = ({ chatId, onSend, onPrefill }) => {
           
           {/* Logo */}
           <div className="mb-4">
-            <Logo key={chatId || 'hero'} chatId={chatId} size={64} />
+            <Logo chatId={chatId} size={64} />
           </div>
           
           {/* Heading */}

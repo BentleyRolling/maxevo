@@ -5,17 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Portal spin animation for logo */
+/* Portal spin animation for logo - refined version */
 .portal-spin {
-  animation: portal-spin 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: portal-spin-v2 1.25s linear 1 forwards;
   will-change: transform, filter;
   transform-origin: 50% 50%;
 }
 
-@keyframes portal-spin {
-  0%   { transform: rotate(0deg)    scale(0.92); filter: blur(6px) saturate(1.1); }
-  60%  { transform: rotate(900deg)  scale(1.02); filter: blur(2px) saturate(1.0); }
-  100% { transform: rotate(1080deg) scale(1.00); filter: blur(0px)  saturate(1.0); }
+/* ~600deg total: ~1.67 turns (feels "whoosh" without over-rotating) */
+@keyframes portal-spin-v2 {
+  0%   { transform: rotate(0deg)    scale(0.98); filter: blur(1.2px); }
+  20%  { transform: rotate(20deg)   scale(0.99); filter: blur(0.9px); }  /* slow start */
+  60%  { transform: rotate(520deg)  scale(1.00); filter: blur(0.35px); } /* fast middle */
+  100% { transform: rotate(600deg)  scale(1.00); filter: blur(0px); }    /* smooth stop */
 }
 
 @media (prefers-reduced-motion: reduce) {

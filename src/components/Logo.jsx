@@ -1,16 +1,26 @@
 import React from "react";
 
 const Logo = ({ chatId, size = 56, className = "" }) => {
-  // key on chatId so starting a new chat re-mounts & retriggers animation
+  const [play, setPlay] = React.useState(false);
+  const last = React.useRef(undefined);
+
+  React.useEffect(() => {
+    if (last.current === chatId) return; // ignore duplicate mounts
+    last.current = chatId;
+    // restart animation by toggling the class once
+    setPlay(false);
+    requestAnimationFrame(() => setPlay(true)); // next frame → apply .portal-spin
+  }, [chatId]);
+
   return (
     <img
-      key={chatId}
       src="/maxevo-logo.png"
-      alt="MaxEvo"
       width={size}
       height={size}
-      className={`portal-spin ${className}`}
+      alt="MaxEvo"
       draggable={false}
+      className={`${play ? "portal-spin" : ""} ${className}`}
+      style={{ display: "block" }}
     />
   );
 };
