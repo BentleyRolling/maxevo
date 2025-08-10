@@ -209,6 +209,30 @@ function broadcastResult(jobId, chatId, response, agent = 'MaxEvo') {
 }
 
 function broadcastError(jobId, chatId, error) {
+  // Provide more specific error messages based on error type
+  let errorCode = 'ASYNC_PROCESSING_FAILED';
+  let errorMessage = 'Long-running task failed to complete';
+  
+  if (error) {
+    if (error.message) {
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        errorCode = 'PROCESSING_TIMEOUT';
+        errorMessage = `Task timed out while processing: ${error.message}`;
+      } else if (error.message.includes('SEARCH') || error.message.includes('retrieval')) {
+        errorCode = 'SEARCH_UNAVAILABLE';  
+        errorMessage = `Search/retrieval service unavailable: ${error.message}`;
+      } else if (error.message.includes('API') || error.message.includes('fetch')) {
+        errorCode = 'EXTERNAL_API_FAILURE';
+        errorMessage = `External API call failed: ${error.message}`;
+      } else if (error.message.includes('memory') || error.message.includes('Memory')) {
+        errorCode = 'MEMORY_ERROR';
+        errorMessage = `Memory system error: ${error.message}`;
+      } else {
+        errorMessage = `Processing failed: ${error.message}`;
+      }
+    }
+  }
+
   const error_data = {
     type: 'assistant_error',
     jobId,
@@ -216,8 +240,8 @@ function broadcastError(jobId, chatId, error) {
     error: true,
     isError: true,
     agent: 'MaxEvo',
-    code: 'ASYNC_PROCESSING_FAILED',
-    message: error?.message || 'Long-running task failed to complete',
+    code: errorCode,
+    message: errorMessage,
     timestamp: new Date().toISOString()
   }
   
@@ -412,24 +436,8 @@ async function processAsyncChat(chatId, message, context, jobId) {
   } catch (error) {
     console.error(`❌ Async processing failed for job ${jobId}:`, error)
     
-    // Send error via WebSocket
-    const error_data = {
-      type: 'assistant_error',
-      jobId,
-      chatId,
-      error: true,
-      isError: true,
-      agent: 'MaxEvo',
-      code: 'ASYNC_PROCESSING_FAILED',
-      message: 'Long-running task failed to complete',
-      timestamp: new Date().toISOString()
-    }
-    
-    wss.clients.forEach(client => {
-      if (client.readyState === 1) { // WebSocket.OPEN = 1
-        client.send(JSON.stringify(error_data))
-      }
-    })
+    // Use the improved broadcastError function for better error reporting
+    broadcastError(jobId, chatId, error)
   }
 }
 

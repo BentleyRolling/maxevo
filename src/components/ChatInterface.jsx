@@ -13,7 +13,7 @@ import { useWebSocket } from '../hooks/useWebSocket'
 
 const ChatInterface = () => {
   const store = useMaxEvoStore()
-  const { setTyping } = useChatStore()
+  const { setTyping, stopThinking } = useChatStore()
   
   const {
     currentChatId,
@@ -33,7 +33,7 @@ const ChatInterface = () => {
   } = store
   
   const messagesEndRef = useRef(null)
-  const { sendMessage, isConnected } = useWebSocket()
+  const { sendMessage, isConnected } = useWebSocket({ stopThinking })
   
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -198,6 +198,7 @@ const ChatInterface = () => {
       })
       
       setAgentStatus('error')
+      stopThinking() // Ensure thinking indicator stops on error
     }
   }
   
