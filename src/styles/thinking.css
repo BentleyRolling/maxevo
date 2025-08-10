@@ -5,23 +5,24 @@
   color: #e5e7eb; 
 }
 
-.shimmer {
+.shimmer{
   color: transparent;
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text; 
   background-clip: text;
   background-image: linear-gradient(90deg,
-    rgba(229,231,235,.78) 0%, rgba(229,231,235,.78) 40%,
-    rgba(255,255,255,.95) 50%, rgba(229,231,235,.78) 60%,
-    rgba(229,231,235,.78) 100%);
-  background-size: 200% 100%;
-  background-position: -200% 0;
-  animation: thinking-shimmer 2.8s linear infinite;
+    rgba(229,231,235,.65) 0%,
+    rgba(255,255,255,.95) 15%,
+    rgba(229,231,235,.65) 30%,
+    rgba(229,231,235,.40) 100%);
+  background-size: 300% 100%;
+  background-position: -200% 0;     /* start off-screen left */
+  animation: thinking-shimmer 4.2s linear infinite;  /* 50% slower: 2.8s → 4.2s */
 }
 
-@keyframes thinking-shimmer { 
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; } 
+@keyframes thinking-shimmer {
+  0%   { background-position: -200% 0; }  /* left */
+  100% { background-position:  200% 0; }  /* right */
 }
 
 /* Fallback for reduced motion or CSS loading issues */

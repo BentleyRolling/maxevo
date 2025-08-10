@@ -29,14 +29,14 @@ export default function ThinkingIndicator({ show = false }) {
   useEffect(() => {
     console.log("👀 ThinkingIndicator show changed:", show)
     if (!show) return;
-    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 2100); // Slowed down by 50%
+    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 3150); // 50% slower: 2100ms → 3150ms
     return () => clearInterval(id);
   }, [show]);
 
   if (!show) return null;
 
   return (
-    <div className="flex items-center gap-2 pb-2 text-base text-zinc-300">
+    <div className="flex items-center gap-2 pb-2 text-sm text-zinc-300">
       <img 
         src="/maxevo-logo.png" 
         alt="" 

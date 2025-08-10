@@ -1,5 +1,6 @@
 const EventEmitter = require('events')
 const { v4: uuidv4 } = require('uuid')
+const { normalizeUserInput } = require('./util/normalizeInput.js')
 
 /**
  * MaxEvoCore - Central orchestration system for MaxEvo AI platform
@@ -173,7 +174,13 @@ class MaxEvoCore extends EventEmitter {
       throw new Error('Agent Router service not available')
     }
     
-    return await agentRouter.routeTask(task)
+    const normalized = normalizeUserInput(task)
+    if (!normalized) throw new Error('Empty user input')
+
+    const routed = { ...task, content: normalized, message: normalized }
+    console.log('🧭 Core.routeTask → Router', { type: routed.type, contentLen: routed.content.length })
+    
+    return await agentRouter.routeTask(routed)
   }
 
   /**
@@ -212,7 +219,13 @@ class MaxEvoCore extends EventEmitter {
   async processGenericTask(task) {
     const agentRouter = this.getService('agentRouter')
     if (agentRouter) {
-      return await agentRouter.routeTask(task)
+      const normalized = normalizeUserInput(task)
+      if (!normalized) throw new Error('Empty user input')
+
+      const routed = { ...task, content: normalized, message: normalized }
+      console.log('🧭 Core.routeTask → Router', { type: routed.type, contentLen: routed.content.length })
+      
+      return await agentRouter.routeTask(routed)
     }
     
     // Fallback response

@@ -2,6 +2,7 @@ const OpenAI = require('openai')
 const Anthropic = require('@anthropic-ai/sdk')
 const WebSearchService = require('./WebSearchService')
 const DeepDiveEngine = require('./DeepDiveEngine')
+const { normalizeUserInput } = require('./util/normalizeInput.js')
 
 /**
  * MaxEvoAgentRouter - Intelligent routing system for AI agents
@@ -347,7 +348,8 @@ class MaxEvoAgentRouter {
     const anthropic = this.agents.get('anthropic')
     
     const systemPrompt = this.getSystemPromptForClaude(task)
-    const userPrompt = this.formatPromptForClaude(task)
+    const prompt = normalizeUserInput(task)
+    if (!prompt) throw new Error('Empty prompt (Claude)')
     
     const response = await anthropic.messages.create({
       model: model,
@@ -357,7 +359,7 @@ class MaxEvoAgentRouter {
       messages: [
         {
           role: 'user',
-          content: userPrompt
+          content: prompt
         }
       ]
     })
@@ -378,6 +380,10 @@ class MaxEvoAgentRouter {
     const openai = this.agents.get('openai')
     
     const systemPrompt = this.getSystemPromptForOpenAI(task)
+    const prompt = normalizeUserInput(task)
+    if (!prompt) throw new Error('Empty prompt (OpenAI)')
+    
+    console.log('🤖 Router → OpenAI', { len: prompt.length })
     
     const response = await openai.chat.completions.create({
       model: model,
@@ -388,7 +394,7 @@ class MaxEvoAgentRouter {
         },
         {
           role: 'user',
-          content: this.formatPromptForOpenAI(task)
+          content: prompt
         }
       ],
       max_tokens: 4096,
@@ -426,26 +432,14 @@ class MaxEvoAgentRouter {
    * Format prompt for Claude
    */
   formatPromptForClaude(task) {
-    // Safety check for null/undefined content
-    if (!task.content) {
-      console.error('❌ DEBUG: Task content is null/undefined:', JSON.stringify(task, null, 2))
-      return task.type || task.data || 'No content provided'
-    }
-    
-    let prompt = task.content
-    
-    if (task.context && task.context.length > 0) {
-      prompt = `Context from recent conversation:\n${task.context.map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\nCurrent request: ${task.content}`
-    }
-    
-    return prompt
+    return normalizeUserInput(task)
   }
 
   /**
    * Format prompt for OpenAI
    */
   formatPromptForOpenAI(task) {
-    return this.formatPromptForClaude(task) // Same format for now
+    return normalizeUserInput(task)
   }
 
   /**

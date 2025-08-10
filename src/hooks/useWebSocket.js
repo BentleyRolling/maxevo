@@ -113,8 +113,9 @@ export const useWebSocket = ({ stopThinking } = {}) => {
           })
           removeQueuedJob(data.jobId)
           setAgentStatus('idle')
-          if (stopThinking) stopThinking()
         }
+        // Always stop thinking on final response
+        if (stopThinking) stopThinking()
         break
         
       case 'assistant_error':
@@ -129,8 +130,9 @@ export const useWebSocket = ({ stopThinking } = {}) => {
           })
           removeQueuedJob(data.jobId)
           setAgentStatus('error')
-          if (stopThinking) stopThinking()
         }
+        // Always stop thinking on error
+        if (stopThinking) stopThinking()
         break
         
       case 'agent_status':
