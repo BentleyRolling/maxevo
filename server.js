@@ -311,8 +311,12 @@ app.post('/api/chat', async (req, res) => {
     if (isDeepDive && process.env.SEARCH_ENABLED === "true") {
       console.log(`⏰ Deep-dive request detected, queueing job: ${jobId}`)
       
-      // Start async processing
-      maxevoInitializer.processChatMessage(chatId, message, context.slice(-5))
+      // Ensure message is preserved in queue payload
+      const raw = message.trim()
+      console.log('🔄 Enqueuing deep-dive with message:', { jobId, messageLen: raw.length })
+      
+      // Start async processing with preserved message
+      maxevoInitializer.processChatMessage(chatId, raw, context.slice(-5), { jobId, message: raw })
         .then(result => {
           console.log(`✅ Async job ${jobId} completed`)
           broadcastResult(jobId, chatId, result.response, result.agent)

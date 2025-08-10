@@ -257,7 +257,7 @@ class MaxEvoInitializer {
   /**
    * Process a chat message through the system
    */
-  async processChatMessage(chatId, message, context = []) {
+  async processChatMessage(chatId, message, context = [], queuePayload = null) {
     if (!this.initialized) {
       throw new Error('MaxEvo system not initialized')
     }
@@ -271,12 +271,18 @@ class MaxEvoInitializer {
         conversationContext = memoryCore.getConversationContext(chatId, 5)
       }
       
+      // Preserve queue message if provided
+      const preservedMessage = queuePayload?.message || message
+      console.log('🔄 ProcessChatMessage preserving message:', { originalLen: message.length, preservedLen: preservedMessage.length })
+      
       // Submit task to core
       const taskId = await core.submitTask({
         type: 'chat',
-        content: message,
+        content: preservedMessage,
+        message: preservedMessage,
         chatId,
-        context: conversationContext
+        context: conversationContext,
+        queuePayload
       })
       
       // Wait for task completion (simplified for demo)
