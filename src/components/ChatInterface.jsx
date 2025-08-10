@@ -35,26 +35,28 @@ const ChatInterface = () => {
     scrollToBottom()
   }, [messages, currentChatId, isTyping])
   
-  // Create initial chat if none exists
-  useEffect(() => {
-    if (!currentChatId) {
-      createChat('New Chat')
-    }
-  }, [currentChatId, createChat])
+  // Don't auto-create chat - show hero screen instead
   
   const handleSendMessage = async (content) => {
     console.log('🔥 handleSendMessage called with:', content)
     console.log('🔥 currentChatId:', currentChatId)
     
-    if (!currentChatId || !content.trim()) {
-      console.log('❌ Early return - no chatId or empty content')
+    if (!content.trim()) {
+      console.log('❌ Early return - empty content')
       return
+    }
+    
+    // Create new chat if none exists (from hero screen)
+    let chatId = currentChatId
+    if (!chatId) {
+      console.log('📝 Creating new chat from hero screen')
+      chatId = createChat('New Chat')
     }
     
     console.log('✅ Proceeding with message handling')
     
     // Add user message
-    addMessage(currentChatId, {
+    addMessage(chatId, {
       role: 'user',
       content: content.trim()
     })
@@ -77,9 +79,9 @@ const ChatInterface = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          chatId: currentChatId,
+          chatId: chatId,
           message: content.trim(),
-          context: messages[currentChatId]?.slice(-10) || [] // Last 10 messages for context
+          context: messages[chatId]?.slice(-10) || [] // Last 10 messages for context
         })
       })
       
@@ -95,7 +97,7 @@ const ChatInterface = () => {
       console.log('🔥 ACTUAL AGENT:', data.agent)
       
       // Add AI response
-      addMessage(currentChatId, {
+      addMessage(chatId, {
         role: 'assistant',
         content: data.response,
         agent: data.agent || 'MaxEvo',
@@ -111,7 +113,7 @@ const ChatInterface = () => {
       console.error('🔥 Error details:', error.message, error.stack)
       
       // Add error message
-      addMessage(currentChatId, {
+      addMessage(chatId, {
         role: 'assistant',
         content: `⚠️ Sorry, I encountered an error: ${error.message}. Please try again.`,
         agent: 'System',
