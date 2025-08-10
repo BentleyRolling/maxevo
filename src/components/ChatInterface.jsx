@@ -183,16 +183,13 @@ const ChatInterface = () => {
                       onSend={handleSendMessage}
                     />
                   ) : (
-                    // Messages - Inherit width from shared container
-                    <div className="w-full py-4">
+                    // Messages - ChatGPT-style layout
+                    <>
                       <MessageList 
                         messages={currentMessages}
-                        isTyping={isTyping}
-                        activeAgent={activeAgent}
-                        agentStatus={agentStatus}
                       />
                       <div ref={messagesEndRef} />
-                    </div>
+                    </>
                   )}
                 </div>
                 
