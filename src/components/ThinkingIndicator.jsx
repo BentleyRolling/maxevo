@@ -29,7 +29,7 @@ export default function ThinkingIndicator({ show = false }) {
   useEffect(() => {
     console.log("👀 ThinkingIndicator show changed:", show)
     if (!show) return;
-    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 2500); // Slower phrase switching
+    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 4000); // Much slower phrase switching
     return () => clearInterval(id);
   }, [show]);
 

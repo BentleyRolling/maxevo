@@ -16,7 +16,7 @@
     rgba(229,231,235,.3) 100%);
   background-size: 200% 100%;
   background-position: -100% 0;
-  animation: thinking-shimmer 3s ease-in-out infinite;
+  animation: thinking-shimmer 6s ease-in-out infinite;
 }
 
 @keyframes thinking-shimmer {
