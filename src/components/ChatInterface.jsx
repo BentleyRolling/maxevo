@@ -29,7 +29,7 @@ const ChatInterface = () => {
   
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
-  const { sendMessage, isConnected } = useWebSocket()
+  const { sendMessage, isConnected } = useWebSocket({ setIsTyping })
   
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -121,6 +121,7 @@ const ChatInterface = () => {
                 })
                 removeQueuedJob(jobId)
                 setAgentStatus('idle')
+                setIsTyping(false)
               } else if (jobData.status === 'error') {
                 console.log('❌ Job failed via polling:', jobData)
                 addMessage(chatId, {
@@ -132,6 +133,7 @@ const ChatInterface = () => {
                 })
                 removeQueuedJob(jobId)
                 setAgentStatus('error')
+                setIsTyping(false)
               }
             }
           } catch (pollError) {
@@ -262,7 +264,7 @@ const ChatInterface = () => {
                 
                 {/* Input Area - Only show when there are messages (not on hero screen) */}
                 {hasActiveChat && (
-                  <div className="absolute bottom-0 left-0 right-0 h-32" style={{background: 'linear-gradient(to top, #0b0b0d 0%, rgba(11,11,13,0.8) 40%, transparent 100%)'}}>
+                  <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent">
                     <div className="px-6 py-6 h-full flex items-end">
                       <ChatInput 
                         onSendMessage={handleSendMessage}

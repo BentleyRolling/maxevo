@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMaxEvoStore } from '../store/maxevoStore'
 
-export const useWebSocket = () => {
+export const useWebSocket = ({ setIsTyping } = {}) => {
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState(null)
   const ws = useRef(null)
@@ -113,6 +113,7 @@ export const useWebSocket = () => {
           })
           removeQueuedJob(data.jobId)
           setAgentStatus('idle')
+          if (setIsTyping) setIsTyping(false)
         }
         break
         
@@ -128,6 +129,7 @@ export const useWebSocket = () => {
           })
           removeQueuedJob(data.jobId)
           setAgentStatus('error')
+          if (setIsTyping) setIsTyping(false)
         }
         break
         

@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import './styles/chatgpt-theme.css'
 import './styles/portal-typing.css'
+import './styles/thinking.css'
 
 // Force rebuild - sidebar fixes v2
 
