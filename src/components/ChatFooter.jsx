@@ -5,7 +5,11 @@ import "../styles/thinking.css";
 
 function ThinkingRow() {
   const show = useChatStore(s => s.thinkingVisible);
-  const phrases = ["Thinking…","Analyzing…","Gathering context…","Synthesizing…","Polishing…"];
+  const phrases = [
+    "Imagining…","Wizarding…","Cooking…","Kabooming…","Philosophizing…",
+    "Baking…","Combobulating…","Brewing…","Germinating…","Pontificating…",
+    "Scheming…","Divining…","Channeling…","Dreaming…","Stewing…","Maxing…"
+  ];
   const [i, setI] = useState(0);
 
   useEffect(() => { console.log("🧩 ThinkingRow mounted"); }, []);
@@ -31,14 +35,11 @@ export default function ChatFooter({ onSendMessage, disabled, placeholder }) {
   return (
     <div className="bg-gradient-to-t from-[#212121] via-[#212121]/80 to-transparent">
       <div className="px-6 py-4">
-        <ThinkingRow />
-        <div className="py-2">
-          <ChatInput 
-            onSendMessage={onSendMessage}
-            disabled={disabled}
-            placeholder={placeholder}
-          />
-        </div>
+        <ChatInput 
+          onSendMessage={onSendMessage}
+          disabled={disabled}
+          placeholder={placeholder}
+        />
       </div>
     </div>
   );

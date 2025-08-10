@@ -2,11 +2,22 @@ import React, { useEffect, useState } from "react";
 
 export default function ThinkingIndicator({ show = false }) {
   const phrases = [
-    "Thinking…", 
-    "Analyzing…", 
-    "Gathering context…",
-    "Synthesizing…", 
-    "Polishing…"
+    "Imagining…",
+    "Wizarding…",
+    "Cooking…", 
+    "Kabooming…",
+    "Philosophizing…",
+    "Baking…",
+    "Combobulating…",
+    "Brewing…",
+    "Germinating…",
+    "Pontificating…",
+    "Scheming…",
+    "Divining…",
+    "Channeling…",
+    "Dreaming…",
+    "Stewing…",
+    "Maxing…"
   ];
   
   const [i, setI] = useState(0);
