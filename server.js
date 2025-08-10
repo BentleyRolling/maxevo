@@ -282,8 +282,8 @@ app.post('/api/chat', async (req, res) => {
       req.body.genius_mode === true ||
       /\b(deep dive|internet deep dive|genius mode|research|investigate)\b/.test(text)
     
-    // Force queueing for deep-dive requests if retrieval is enabled
-    if (isDeepDive && process.env.RETRIEVAL_ENABLED === "true") {
+    // Force queueing for deep-dive requests if search is enabled
+    if (isDeepDive && process.env.SEARCH_ENABLED === "true") {
       console.log(`⏰ Deep-dive request detected, queueing job: ${jobId}`)
       
       // Start async processing

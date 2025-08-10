@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import ChatHeader from './ChatHeader'
 import MessageList from './MessageList'
 import ChatInput from './ChatInput'
+import ThinkingIndicator from './ThinkingIndicator'
 import ChatsView from './ChatsView'
 import ProjectsView from './ProjectsView'
 import HeroChat from './HeroChat'
@@ -27,7 +28,8 @@ const ChatInterface = () => {
     addJobPollingTimeout,
     isTyping,
     startThinking,
-    stopThinking
+    stopThinking,
+    thinkingVisible
   } = useMaxEvoStore()
   
   const messagesEndRef = useRef(null)
@@ -267,19 +269,22 @@ const ChatInterface = () => {
                 
                 {/* Input Area - Only show when there are messages (not on hero screen) */}
                 {hasActiveChat && (
-                  <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#212121] via-[#212121]/80 to-transparent">
-                    <div className="px-6 py-6 h-full flex items-end">
-                      <ChatInput 
-                        onSendMessage={handleSendMessage}
-                        disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
-                        placeholder={
-                          agentStatus === 'thinking' 
-                            ? `${activeAgent} is thinking...`
-                            : agentStatus === 'executing'
-                            ? `${activeAgent} is executing...`
-                            : 'Message MaxEvo...'
-                        }
-                      />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121]/80 to-transparent">
+                    <div className="px-6 py-4">
+                      <ThinkingIndicator show={thinkingVisible} />
+                      <div className="py-2">
+                        <ChatInput 
+                          onSendMessage={handleSendMessage}
+                          disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
+                          placeholder={
+                            agentStatus === 'thinking' 
+                              ? `${activeAgent} is thinking...`
+                              : agentStatus === 'executing'
+                              ? `${activeAgent} is executing...`
+                              : 'Message MaxEvo...'
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
