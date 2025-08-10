@@ -5,6 +5,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Portal spin animation for logo */
+.portal-spin {
+  animation: portal-spin 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, filter;
+  transform-origin: 50% 50%;
+}
+
+@keyframes portal-spin {
+  0%   { transform: rotate(0deg)    scale(0.92); filter: blur(6px) saturate(1.1); }
+  60%  { transform: rotate(900deg)  scale(1.02); filter: blur(2px) saturate(1.0); }
+  100% { transform: rotate(1080deg) scale(1.00); filter: blur(0px)  saturate(1.0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-spin { 
+    animation: none; 
+    transform: none; 
+    filter: none; 
+  }
+}
+
 /* ChatGPT-style scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
