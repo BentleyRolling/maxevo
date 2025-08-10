@@ -9,7 +9,7 @@ const Logo = ({ chatId, size = 56, className = "" }) => {
     last.current = chatId;
     // restart animation by toggling the class once
     setPlay(false);
-    requestAnimationFrame(() => setPlay(true)); // next frame → apply .portal-spin
+    requestAnimationFrame(() => setPlay(true)); // next frame → apply .portal-winddown
   }, [chatId]);
 
   return (
@@ -19,7 +19,7 @@ const Logo = ({ chatId, size = 56, className = "" }) => {
       height={size}
       alt="MaxEvo"
       draggable={false}
-      className={`${play ? "portal-spin" : ""} ${className}`}
+      className={`${play ? "portal-winddown" : ""} ${className}`}
       style={{ display: "block" }}
     />
   );
