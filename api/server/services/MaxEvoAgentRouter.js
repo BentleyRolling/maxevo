@@ -426,6 +426,12 @@ class MaxEvoAgentRouter {
    * Format prompt for Claude
    */
   formatPromptForClaude(task) {
+    // Safety check for null/undefined content
+    if (!task.content) {
+      console.error('❌ DEBUG: Task content is null/undefined:', JSON.stringify(task, null, 2))
+      return task.type || task.data || 'No content provided'
+    }
+    
     let prompt = task.content
     
     if (task.context && task.context.length > 0) {

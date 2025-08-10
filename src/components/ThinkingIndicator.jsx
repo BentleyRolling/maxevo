@@ -36,11 +36,11 @@ export default function ThinkingIndicator({ show = false }) {
   if (!show) return null;
 
   return (
-    <div className="flex items-center gap-3 pb-2 text-xl font-semibold text-zinc-300">
+    <div className="flex items-center gap-2 pb-2 text-base text-zinc-300">
       <img 
         src="/maxevo-logo.png" 
         alt="" 
-        className="h-6 w-6 portal-winddown-loop" 
+        className="h-5 w-5 portal-winddown-loop" 
         draggable={false}
       />
       <span 
@@ -48,8 +48,7 @@ export default function ThinkingIndicator({ show = false }) {
         style={{
           // Fallback styles in case CSS doesn't load
           color: '#e5e7eb',
-          fontSize: '20px',
-          fontWeight: '600'
+          fontSize: '16px'
         }}
         aria-live="polite"
       >
