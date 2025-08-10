@@ -107,8 +107,13 @@ const ChatInterface = () => {
           
           console.log('📊 Polling for job status:', jobId)
           try {
-            const pollResponse = await fetch(`/api/jobs/${jobId}`)
-            if (pollResponse.ok) {
+            const pollResponse = await fetch(`/api/jobs/${jobId}`, { 
+              headers: { 
+                'accept': 'application/json',
+                'content-type': 'application/json'
+              }
+            })
+            if (pollResponse.ok && pollResponse.headers.get('content-type')?.includes('application/json')) {
               const jobData = await pollResponse.json()
               
               if (jobData.status === 'done') {
@@ -135,6 +140,8 @@ const ChatInterface = () => {
                 setAgentStatus('error')
                 setIsTyping(false)
               }
+            } else {
+              console.error('Non-JSON response from polling endpoint')
             }
           } catch (pollError) {
             console.error('Polling error:', pollError)

@@ -110,8 +110,15 @@ wss.on('connection', (ws, req) => {
       
       switch (message.type) {
         case 'handshake':
+          // Store session mapping if sessionId provided
+          if (message.sessionId) {
+            ws.sessionId = message.sessionId
+            // You could store this in a sessions Map if needed
+            // sessions.set(message.sessionId, ws)
+          }
           ws.send(JSON.stringify({
             type: 'handshake_ack',
+            sessionId: message.sessionId, // Echo the sessionId back
             timestamp: new Date().toISOString()
           }))
           break
@@ -377,6 +384,28 @@ app.get('/api/tasks', (req, res) => {
   
   res.json({
     tasks,
+    timestamp: new Date().toISOString()
+  })
+})
+
+// Job status endpoint for polling fallback
+app.get('/api/jobs/:id', (req, res) => {
+  const jobId = req.params.id
+  
+  // Set proper content type
+  res.type('application/json')
+  
+  // In a real implementation, you'd check a job store
+  // For now, return a simple status
+  if (!jobId) {
+    return res.status(400).json({ status: 'error', message: 'Job ID required' })
+  }
+  
+  // Mock job status - in reality you'd check maxevoComponents.core or similar
+  res.json({
+    jobId,
+    status: 'unknown', // could be 'pending', 'done', 'error'
+    message: 'Job status lookup not fully implemented',
     timestamp: new Date().toISOString()
   })
 })
