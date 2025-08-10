@@ -7,13 +7,13 @@
 
 /* Portal spin animation for logo - refined version */
 .portal-spin {
-  animation: portal-spin-v2 1.25s linear 1 forwards;
+  animation: portal-whoosh 1.25s linear 1 forwards;
   will-change: transform, filter;
   transform-origin: 50% 50%;
 }
 
 /* ~600deg total: ~1.67 turns (feels "whoosh" without over-rotating) */
-@keyframes portal-spin-v2 {
+@keyframes portal-whoosh {
   0%   { transform: rotate(0deg)    scale(0.98); filter: blur(1.2px); }
   20%  { transform: rotate(20deg)   scale(0.99); filter: blur(0.9px); }  /* slow start */
   60%  { transform: rotate(520deg)  scale(1.00); filter: blur(0.35px); } /* fast middle */
