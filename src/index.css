@@ -5,23 +5,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Portal wind-down animation - physics-based deceleration */
+/* Smooth, consistent loading spinner */
 .portal-winddown {
-  animation: portal-winddown 1.2s linear 1 both;
-  will-change: transform, filter;
+  animation: smooth-loading-spin 3s linear infinite;
+  will-change: transform;
   transform-origin: 50% 50%;
-  transform: translateZ(0);
 }
 
-/* Decelerating rotation: big early jumps, tiny late jumps */
-@keyframes portal-winddown {
-  0%   { transform: rotate(0deg)    scale(0.99); filter: blur(0.6px); }
-  10%  { transform: rotate(260deg)  scale(1.00); filter: blur(0.4px); }  /* very fast */
-  25%  { transform: rotate(430deg);              filter: blur(0.25px); }
-  45%  { transform: rotate(560deg);              filter: blur(0.15px); }
-  65%  { transform: rotate(630deg);              filter: blur(0.08px); }
-  85%  { transform: rotate(700deg);              filter: blur(0.03px); }
-  100% { transform: rotate(720deg);              filter: blur(0px); }    /* gentle stop */
+/* Simple, smooth rotation */
+@keyframes smooth-loading-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Respect accessibility */
