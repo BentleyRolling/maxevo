@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import './styles/chatgpt-theme.css'
+import './styles/portal-typing.css'
 
 // Force rebuild - sidebar fixes v2
 
