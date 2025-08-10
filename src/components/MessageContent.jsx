@@ -3,7 +3,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 
@@ -31,7 +30,7 @@ export default function MessageContent({ message, isFinal = true }) {
             prose-p:my-4 prose-headings:mt-6 prose-headings:mb-3
             prose-h1:text-3xl prose-h1:text-white prose-h2:text-2xl prose-h2:text-white prose-h3:text-xl prose-h3:text-white
             prose-strong:text-white
-            prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-a:underline
+            prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-a:underline prose-a:underline-offset-2
             prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4
             prose-blockquote:italic prose-blockquote:text-blue-200 prose-blockquote:bg-blue-900/10 prose-blockquote:py-2 prose-blockquote:rounded-r
             prose-pre:bg-neutral-950 prose-pre:border prose-pre:border-neutral-800 prose-pre:rounded-xl overflow-x-auto
@@ -41,8 +40,8 @@ export default function MessageContent({ message, isFinal = true }) {
           remarkPlugins={[remarkGfm, remarkBreaks]}
           rehypePlugins={
             isFinal
-              ? [rehypeSlug, [rehypeAutolinkHeadings, { behavior: "wrap" }], rehypeHighlight]
-              : [rehypeSlug, [rehypeAutolinkHeadings, { behavior: "wrap" }]]
+              ? [rehypeSlug, rehypeHighlight]
+              : [rehypeSlug]
           }
         >
           {message.content}
