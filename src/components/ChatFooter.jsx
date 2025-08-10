@@ -16,15 +16,15 @@ function ThinkingRow() {
   useEffect(() => {
     console.log("👀 thinkingVisible:", show);
     if (!show) return;
-    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 1400);
+    const id = setInterval(() => setI(v => (v + 1) % phrases.length), 2100); // Slowed down by 50%
     return () => clearInterval(id);
   }, [show]);
 
   if (!show) return null;
 
   return (
-    <div className="flex items-center gap-2 pb-2 text-sm text-zinc-300">
-      <img src="/maxevo-logo.png" alt="" className="h-4 w-4 portal-winddown-loop" />
+    <div className="flex items-center gap-3 pb-2 text-xl font-semibold text-zinc-300">
+      <img src="/maxevo-logo.png" alt="" className="h-6 w-6 portal-winddown-loop" />
       <span className="thinking-text shimmer" aria-live="polite">{phrases[i]}</span>
     </div>
   );

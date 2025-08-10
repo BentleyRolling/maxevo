@@ -15,13 +15,13 @@
     rgba(255,255,255,.95) 50%, rgba(229,231,235,.78) 60%,
     rgba(229,231,235,.78) 100%);
   background-size: 200% 100%;
-  background-position: 0% 0;
+  background-position: -200% 0;
   animation: thinking-shimmer 2.8s linear infinite;
 }
 
 @keyframes thinking-shimmer { 
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; } 
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; } 
 }
 
 /* Fallback for reduced motion or CSS loading issues */
