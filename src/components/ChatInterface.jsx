@@ -11,6 +11,7 @@ import { useMaxEvoStore } from '../store/maxevoStore'
 import { useWebSocket } from '../hooks/useWebSocket'
 
 const ChatInterface = () => {
+  const store = useMaxEvoStore()
   const {
     currentChatId,
     currentView,
@@ -31,7 +32,13 @@ const ChatInterface = () => {
     stopThinking,
     thinkingVisible,
     setTyping
-  } = useMaxEvoStore()
+  } = store
+
+  // Attach store to window for debugging
+  React.useEffect(() => {
+    window.__store = useMaxEvoStore
+    console.log('🔧 Store attached in ChatInterface:', !!window.__store)
+  }, [])
   
   const messagesEndRef = useRef(null)
   const { sendMessage, isConnected } = useWebSocket({ stopThinking })

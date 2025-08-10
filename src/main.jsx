@@ -10,6 +10,7 @@ import { useMaxEvoStore } from './store/maxevoStore'
 // Add store to window for debugging
 if (typeof window !== 'undefined') {
   window.__store = useMaxEvoStore
+  console.log('🔧 Store attached to window:', !!window.__store)
 }
 
 // Force rebuild - sidebar fixes v2
