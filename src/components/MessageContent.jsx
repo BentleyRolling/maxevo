@@ -29,7 +29,7 @@ export default function MessageContent({ message, isFinal = true }) {
           className="
             prose prose-invert max-w-none
             prose-p:my-4 prose-headings:mt-6 prose-headings:mb-3
-            prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
+            prose-h1:text-3xl prose-h1:text-white prose-h2:text-2xl prose-h2:text-white prose-h3:text-xl prose-h3:text-white
             prose-strong:text-white
             prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-a:underline
             prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4
