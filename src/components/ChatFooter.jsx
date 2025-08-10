@@ -24,7 +24,7 @@ function ThinkingRow() {
 
   return (
     <div className="flex items-center gap-2 pb-2 text-sm text-zinc-300">
-      <img src="/maxevo-logo.png" alt="" className="h-5 w-5 portal-winddown-loop" />
+      <img src="/maxevo-logo.png" alt="" className="h-5 w-5 loading-spinner" />
       <span className="thinking-text shimmer" aria-live="polite">{phrases[i]}</span>
     </div>
   );

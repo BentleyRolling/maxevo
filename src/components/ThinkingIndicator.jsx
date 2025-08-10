@@ -40,7 +40,7 @@ export default function ThinkingIndicator({ show = false }) {
       <img 
         src="/maxevo-logo.png" 
         alt="" 
-        className="h-5 w-5 portal-winddown-loop" 
+        className="h-5 w-5 loading-spinner" 
         draggable={false}
       />
       <span 
