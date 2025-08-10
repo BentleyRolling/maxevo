@@ -27,6 +27,11 @@ export const useMaxEvoStore = create(
         webSocket: 'offline'
       },
       
+      // Job and Session Management
+      sessionId: null,
+      queuedJobs: [],
+      jobPollingTimeouts: {},
+      
       // UI State
       sidebarOpen: true,
       currentView: 'chat', // chat, projects, dashboard
@@ -172,6 +177,57 @@ export const useMaxEvoStore = create(
           chats: state.chats.map(chat =>
             chat.id === chatId ? { ...chat, messageCount: 0 } : chat
           )
+        }))
+      },
+      
+      // Job Management
+      setSessionId: (sessionId) => {
+        set({ sessionId })
+      },
+      
+      getOrCreateSessionId: () => {
+        const state = get()
+        if (state.sessionId) return state.sessionId
+        
+        const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        set({ sessionId: newSessionId })
+        return newSessionId
+      },
+      
+      addQueuedJob: (jobId) => {
+        set(state => ({
+          queuedJobs: [...state.queuedJobs.filter(id => id !== jobId), jobId]
+        }))
+      },
+      
+      removeQueuedJob: (jobId) => {
+        set(state => {
+          const newQueuedJobs = state.queuedJobs.filter(id => id !== jobId)
+          
+          // Clear any polling timeout for this job
+          const newTimeouts = { ...state.jobPollingTimeouts }
+          if (newTimeouts[jobId]) {
+            clearTimeout(newTimeouts[jobId])
+            delete newTimeouts[jobId]
+          }
+          
+          return { 
+            queuedJobs: newQueuedJobs,
+            jobPollingTimeouts: newTimeouts
+          }
+        })
+      },
+      
+      hasQueuedJobs: () => {
+        return get().queuedJobs.length > 0
+      },
+      
+      addJobPollingTimeout: (jobId, timeoutId) => {
+        set(state => ({
+          jobPollingTimeouts: {
+            ...state.jobPollingTimeouts,
+            [jobId]: timeoutId
+          }
         }))
       }
     }),

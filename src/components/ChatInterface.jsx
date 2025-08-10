@@ -19,7 +19,12 @@ const ChatInterface = () => {
     setAgentStatus,
     agentStatus,
     activeAgent,
-    sidebarOpen
+    sidebarOpen,
+    getOrCreateSessionId,
+    addQueuedJob,
+    removeQueuedJob,
+    hasQueuedJobs,
+    addJobPollingTimeout
   } = useMaxEvoStore()
   
   const [isTyping, setIsTyping] = useState(false)
@@ -72,7 +77,7 @@ const ChatInterface = () => {
     try {
       console.log('🚀 About to send message to MaxEvo backend:', content.trim())
       
-      // Send to MaxEvo backend
+      // Send to MaxEvo backend with session ID
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -81,16 +86,72 @@ const ChatInterface = () => {
         body: JSON.stringify({
           chatId: chatId,
           message: content.trim(),
+          sessionId: getOrCreateSessionId(),
           context: messages[chatId]?.slice(-10) || [] // Last 10 messages for context
         })
       })
       
       console.log('📥 Response status:', response.status)
       
-      if (!response.ok) {
-        throw new Error('Failed to send message')
+      // Handle 202 - Job queued
+      if (response.status === 202) {
+        const { jobId } = await response.json()
+        console.log('⏳ Job queued with ID:', jobId)
+        
+        // Track the queued job
+        addQueuedJob(jobId)
+        
+        // Set up polling fallback in case WebSocket drops
+        const pollTimeout = setTimeout(async () => {
+          if (!hasQueuedJobs()) return // Job already completed
+          
+          console.log('📊 Polling for job status:', jobId)
+          try {
+            const pollResponse = await fetch(`/api/jobs/${jobId}`)
+            if (pollResponse.ok) {
+              const jobData = await pollResponse.json()
+              
+              if (jobData.status === 'done') {
+                console.log('✅ Job completed via polling:', jobData)
+                addMessage(chatId, {
+                  role: 'assistant',
+                  content: jobData.text || jobData.result,
+                  agent: jobData.agent || 'MaxEvo',
+                  taskId: jobId
+                })
+                removeQueuedJob(jobId)
+                setAgentStatus('idle')
+              } else if (jobData.status === 'error') {
+                console.log('❌ Job failed via polling:', jobData)
+                addMessage(chatId, {
+                  role: 'assistant',
+                  content: `⚠️ Deep Dive failed: ${jobData.message || 'Unknown error'}`,
+                  agent: 'MaxEvo',
+                  taskId: jobId,
+                  error: true
+                })
+                removeQueuedJob(jobId)
+                setAgentStatus('error')
+              }
+            }
+          } catch (pollError) {
+            console.error('Polling error:', pollError)
+          }
+        }, 10000) // Poll after 10 seconds
+        
+        addJobPollingTimeout(jobId, pollTimeout)
+        
+        // Keep typing indicator ON and return early
+        console.log('✅ Job queued, keeping typing indicator active')
+        return
       }
       
+      // Handle other non-OK responses
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      
+      // Handle immediate response (non-queued)
       const data = await response.json()
       console.log('📋 Response data:', data)
       console.log('🔥 ACTUAL RESPONSE TEXT:', data.response)
@@ -122,8 +183,13 @@ const ChatInterface = () => {
       
       setAgentStatus('error')
     } finally {
-      console.log('🔥 Finally block - setting typing to false')
-      setIsTyping(false)
+      // Only clear typing if we don't have any queued jobs
+      if (!hasQueuedJobs()) {
+        console.log('🔥 Finally block - setting typing to false (no queued jobs)')
+        setIsTyping(false)
+      } else {
+        console.log('🔥 Finally block - keeping typing active (have queued jobs)')
+      }
     }
   }
   

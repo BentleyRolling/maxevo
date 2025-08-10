@@ -13,7 +13,10 @@ export const useWebSocket = () => {
     setAgentStatus,
     addMessage,
     currentChatId,
-    updateTaskStatus
+    updateTaskStatus,
+    setSessionId,
+    getOrCreateSessionId,
+    removeQueuedJob
   } = useMaxEvoStore()
   
   const connect = () => {
@@ -31,9 +34,10 @@ export const useWebSocket = () => {
         // Update system status
         updateSystemStatus('webSocket', 'online')
         
-        // Send authentication/handshake
+        // Send authentication/handshake with session ID
         sendMessage({
           type: 'handshake',
+          sessionId: getOrCreateSessionId(),
           timestamp: new Date().toISOString()
         })
       }
@@ -90,6 +94,43 @@ export const useWebSocket = () => {
     console.log('📨 WebSocket message:', data)
     
     switch (data.type) {
+      case 'handshake_ack':
+        console.log('🤝 WebSocket handshake acknowledged:', data.sessionId)
+        if (data.sessionId) {
+          setSessionId(data.sessionId)
+        }
+        break
+        
+      case 'assistant_final':
+        console.log('✅ Assistant final response:', data)
+        if (currentChatId && data.jobId) {
+          addMessage(currentChatId, {
+            role: 'assistant',
+            content: data.text || data.content,
+            agent: data.agent || 'MaxEvo',
+            taskId: data.jobId,
+            metadata: data.metadata
+          })
+          removeQueuedJob(data.jobId)
+          setAgentStatus('idle')
+        }
+        break
+        
+      case 'assistant_error':
+        console.log('❌ Assistant error:', data)
+        if (currentChatId && data.jobId) {
+          addMessage(currentChatId, {
+            role: 'assistant',
+            content: `⚠️ Deep Dive failed: ${data.message || data.error || 'Unknown error'}`,
+            agent: 'MaxEvo',
+            taskId: data.jobId,
+            error: true
+          })
+          removeQueuedJob(data.jobId)
+          setAgentStatus('error')
+        }
+        break
+        
       case 'agent_status':
         setAgentStatus(data.status, data.agent)
         break
@@ -134,7 +175,7 @@ export const useWebSocket = () => {
         break
         
       default:
-        console.log('Unknown WebSocket message type:', data.type)
+        console.warn('Unknown WebSocket message type:', data.type)
     }
   }
   
