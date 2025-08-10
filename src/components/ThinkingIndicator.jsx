@@ -12,7 +12,7 @@ const DEFAULT_MESSAGES = [
 export default function ThinkingIndicator({
   show,
   messages = DEFAULT_MESSAGES,
-  intervalMs = 1200
+  intervalMs = 2800   // slower, matches the sweep
 }) {
   const [i, setI] = React.useState(0);
   
@@ -33,7 +33,7 @@ export default function ThinkingIndicator({
           className="h-4 w-4 portal-winddown-loop"
           draggable={false}
         />
-        <span className="text-sm thinking-shimmer">{messages[i]}</span>
+        <span className="text-sm thinking-text shimmer">{messages[i]}</span>
       </div>
     </div>
   );
