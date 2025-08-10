@@ -23,7 +23,8 @@ export default function ThinkingIndicator({
   show,
   messages = DEFAULT_MESSAGES,
   sweepMs = 2800,       // shimmer duration (should match CSS 2.8s)
-  rotateEvery = 3200    // phrase cadence (slightly slower than shimmer)
+  rotateEvery = 3200,   // phrase cadence (slightly slower than shimmer)
+  enableShimmer = true  // safe fallback if CSS fails to load
 }) {
   const [idx, setIdx] = React.useState(0);    // which phrase index
   const [slot, setSlot] = React.useState(0);  // 0 or 1 visible layer
@@ -62,13 +63,13 @@ export default function ThinkingIndicator({
         {/* Cross-fade stack: two layers, one showing, one hidden */}
         <div className="relative overflow-hidden leading-6">
           <span
-            className={`thinking-text shimmer thinking-line text-lg ${slot === 0 ? "show" : ""}`}
+            className={`thinking-text ${enableShimmer ? "shimmer" : ""} thinking-line text-lg ${slot === 0 ? "show" : ""}`}
             aria-hidden={slot !== 0}
           >
             {current}
           </span>
           <span
-            className={`thinking-text shimmer thinking-line text-lg ${slot === 1 ? "show" : ""}`}
+            className={`thinking-text ${enableShimmer ? "shimmer" : ""} thinking-line text-lg ${slot === 1 ? "show" : ""}`}
             aria-hidden={slot !== 1}
           >
             {prev}
