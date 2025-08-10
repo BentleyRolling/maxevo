@@ -19,6 +19,11 @@ export const useMaxEvoStore = create(
       agentStatus: 'idle', // idle, thinking, executing, error
       taskQueue: [],
       
+      // Thinking Indicator State
+      isTyping: false,
+      thinkingVisible: false,
+      thinkingUntil: null,
+      
       // System Status
       systemStatus: {
         memoryCore: 'offline',
@@ -229,6 +234,25 @@ export const useMaxEvoStore = create(
             [jobId]: timeoutId
           }
         }))
+      },
+      
+      // Thinking Indicator Methods
+      startThinking: (minMs = 800) => {
+        const until = Date.now() + minMs
+        set({ isTyping: true, thinkingVisible: true, thinkingUntil: until })
+      },
+
+      stopThinking: () => {
+        const until = get().thinkingUntil ?? 0
+        const wait = Math.max(0, until - Date.now())
+        if (wait <= 0) {
+          set({ isTyping: false, thinkingVisible: false, thinkingUntil: null })
+        } else {
+          setTimeout(() => 
+            set({ isTyping: false, thinkingVisible: false, thinkingUntil: null }),
+            wait
+          )
+        }
       }
     }),
     {

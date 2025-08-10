@@ -24,12 +24,14 @@ const ChatInterface = () => {
     addQueuedJob,
     removeQueuedJob,
     hasQueuedJobs,
-    addJobPollingTimeout
+    addJobPollingTimeout,
+    isTyping,
+    startThinking,
+    stopThinking
   } = useMaxEvoStore()
   
-  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
-  const { sendMessage, isConnected } = useWebSocket({ setIsTyping })
+  const { sendMessage, isConnected } = useWebSocket({ stopThinking })
   
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -69,7 +71,7 @@ const ChatInterface = () => {
     console.log('✅ User message added to store')
     
     // Show typing indicator
-    setIsTyping(true)
+    startThinking(900)
     setAgentStatus('thinking', 'MaxEvo')
     
     console.log('✅ Typing indicator set')
@@ -126,7 +128,7 @@ const ChatInterface = () => {
                 })
                 removeQueuedJob(jobId)
                 setAgentStatus('idle')
-                setIsTyping(false)
+                stopThinking()
               } else if (jobData.status === 'error') {
                 console.log('❌ Job failed via polling:', jobData)
                 addMessage(chatId, {
@@ -138,7 +140,7 @@ const ChatInterface = () => {
                 })
                 removeQueuedJob(jobId)
                 setAgentStatus('error')
-                setIsTyping(false)
+                stopThinking()
               }
             } else {
               console.error('Non-JSON response from polling endpoint')
@@ -175,6 +177,9 @@ const ChatInterface = () => {
         metadata: data.metadata
       })
       
+      // Stop thinking indicator (store enforces min visible time)
+      stopThinking()
+      
       // Update agent status
       setAgentStatus('idle')
       
@@ -191,14 +196,6 @@ const ChatInterface = () => {
       })
       
       setAgentStatus('error')
-    } finally {
-      // Only clear typing if we don't have any queued jobs
-      if (!hasQueuedJobs()) {
-        console.log('🔥 Finally block - setting typing to false (no queued jobs)')
-        setIsTyping(false)
-      } else {
-        console.log('🔥 Finally block - keeping typing active (have queued jobs)')
-      }
     }
   }
   
@@ -262,7 +259,6 @@ const ChatInterface = () => {
                     <>
                       <MessageList 
                         messages={currentMessages}
-                        isTyping={isTyping}
                       />
                       <div ref={messagesEndRef} />
                     </>
