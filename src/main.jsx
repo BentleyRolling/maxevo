@@ -5,11 +5,11 @@ import './index.css'
 import './styles/chatgpt-theme.css'
 import './styles/portal-typing.css'
 import './styles/thinking.css'
-import { useMaxEvoStore } from './store/maxevoStore'
+import { useChatStore } from '@/store/chatStore'
 
 // Add store to window for debugging
 if (typeof window !== 'undefined') {
-  window.__store = useMaxEvoStore
+  window.__store = useChatStore
   console.log('🔧 Store attached to window:', !!window.__store)
 }
 

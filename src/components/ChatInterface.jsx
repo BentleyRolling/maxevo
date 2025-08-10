@@ -3,15 +3,18 @@ import Sidebar from './Sidebar'
 import ChatHeader from './ChatHeader'
 import MessageList from './MessageList'
 import ChatInput from './ChatInput'
-import ThinkingIndicator from './ThinkingIndicator'
+import ChatFooter from './ChatFooter'
 import ChatsView from './ChatsView'
 import ProjectsView from './ProjectsView'
 import HeroChat from './HeroChat'
+import { useChatStore } from '@/store/chatStore'
 import { useMaxEvoStore } from '../store/maxevoStore'
 import { useWebSocket } from '../hooks/useWebSocket'
 
 const ChatInterface = () => {
   const store = useMaxEvoStore()
+  const { setTyping } = useChatStore()
+  
   const {
     currentChatId,
     currentView,
@@ -26,22 +29,11 @@ const ChatInterface = () => {
     addQueuedJob,
     removeQueuedJob,
     hasQueuedJobs,
-    addJobPollingTimeout,
-    isTyping,
-    startThinking,
-    stopThinking,
-    thinkingVisible,
-    setTyping
+    addJobPollingTimeout
   } = store
-
-  // Attach store to window for debugging
-  React.useEffect(() => {
-    window.__store = useMaxEvoStore
-    console.log('🔧 Store attached in ChatInterface:', !!window.__store)
-  }, [])
   
   const messagesEndRef = useRef(null)
-  const { sendMessage, isConnected } = useWebSocket({ stopThinking })
+  const { sendMessage, isConnected } = useWebSocket()
   
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -50,7 +42,7 @@ const ChatInterface = () => {
   
   useEffect(() => {
     scrollToBottom()
-  }, [messages, currentChatId, isTyping])
+  }, [messages, currentChatId])
   
   // Don't auto-create chat - show hero screen instead
   
@@ -81,7 +73,7 @@ const ChatInterface = () => {
     console.log('✅ User message added to store')
     
     // Show typing indicator
-    startThinking(900)
+    setTyping(true)
     setAgentStatus('thinking', 'MaxEvo')
     
     console.log('✅ Typing indicator set')
@@ -188,7 +180,7 @@ const ChatInterface = () => {
       })
       
       // Stop thinking indicator (store enforces min visible time)
-      stopThinking()
+      setTyping(false)
       
       // Update agent status
       setAgentStatus('idle')
@@ -277,24 +269,18 @@ const ChatInterface = () => {
                 
                 {/* Input Area - Only show when there are messages (not on hero screen) */}
                 {hasActiveChat && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#212121] via-[#212121]/80 to-transparent">
-                    <div className="px-6 py-4">
-                      {console.log("📦 ChatInterface footer render, thinkingVisible:", thinkingVisible)}
-                      <ThinkingIndicator show={thinkingVisible} />
-                      <div className="py-2">
-                        <ChatInput 
-                          onSendMessage={handleSendMessage}
-                          disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
-                          placeholder={
-                            agentStatus === 'thinking' 
-                              ? `${activeAgent} is thinking...`
-                              : agentStatus === 'executing'
-                              ? `${activeAgent} is executing...`
-                              : 'Message MaxEvo...'
-                          }
-                        />
-                      </div>
-                    </div>
+                  <div className="absolute bottom-0 left-0 right-0">
+                    <ChatFooter 
+                      onSendMessage={handleSendMessage}
+                      disabled={agentStatus === 'thinking' || agentStatus === 'executing'}
+                      placeholder={
+                        agentStatus === 'thinking' 
+                          ? `${activeAgent} is thinking...`
+                          : agentStatus === 'executing'
+                          ? `${activeAgent} is executing...`
+                          : 'Message MaxEvo...'
+                      }
+                    />
                   </div>
                 )}
               </div>
