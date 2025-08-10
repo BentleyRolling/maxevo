@@ -1,6 +1,6 @@
 {
   "name": "maxevo-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MaxEvo AI Orchestration System - ChatGPT-style Interface",
   "scripts": {
     "dev": "vite",
