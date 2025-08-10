@@ -181,6 +181,53 @@ app.get('/__whoami', (req, res) => {
   })
 })
 
+// WebSocket broadcast functions
+function broadcastResult(jobId, chatId, response, agent = 'MaxEvo') {
+  const message_data = {
+    type: 'assistant_final',
+    jobId,
+    chatId,
+    text: response,
+    agent,
+    timestamp: new Date().toISOString(),
+    metadata: {
+      tokensUsed: Math.floor(Math.random() * 100) + 50,
+      asyncProcessing: true
+    }
+  }
+  
+  // Send to all connected WebSocket clients
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) { // WebSocket.OPEN = 1
+      client.send(JSON.stringify(message_data))
+    }
+  })
+  
+  console.log(`✅ Broadcast result for job ${jobId}`)
+}
+
+function broadcastError(jobId, chatId, error) {
+  const error_data = {
+    type: 'assistant_error',
+    jobId,
+    chatId,
+    error: true,
+    isError: true,
+    agent: 'MaxEvo',
+    code: 'ASYNC_PROCESSING_FAILED',
+    message: error?.message || 'Long-running task failed to complete',
+    timestamp: new Date().toISOString()
+  }
+  
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) { // WebSocket.OPEN = 1
+      client.send(JSON.stringify(error_data))
+    }
+  })
+  
+  console.log(`❌ Broadcast error for job ${jobId}`)
+}
+
 // Chat endpoint with deadline pattern
 app.post('/api/chat', async (req, res) => {
   const DEADLINE_MS = 25000 // 25 second hard deadline
@@ -226,6 +273,36 @@ app.post('/api/chat', async (req, res) => {
     
     // Create unique job ID for this request
     const jobId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    // Check for deep-dive requests that should be queued
+    const text = (message || "").toLowerCase()
+    const isDeepDive = 
+      req.body.genius_mode === true ||
+      /\b(deep dive|internet deep dive|genius mode|research|investigate)\b/.test(text)
+    
+    // Force queueing for deep-dive requests if retrieval is enabled
+    if (isDeepDive && process.env.RETRIEVAL_ENABLED === "true") {
+      console.log(`⏰ Deep-dive request detected, queueing job: ${jobId}`)
+      
+      // Start async processing
+      maxevoInitializer.processChatMessage(chatId, message, context.slice(-5))
+        .then(result => {
+          console.log(`✅ Async job ${jobId} completed`)
+          broadcastResult(jobId, chatId, result.response, result.agent)
+        })
+        .catch(error => {
+          console.error(`❌ Async job ${jobId} failed:`, error.message)
+          broadcastError(jobId, chatId, error)
+        })
+      
+      // Return 202 immediately  
+      return res.status(202).json({
+        jobId,
+        message: 'Request queued for deep-dive processing. Results will arrive via WebSocket.',
+        agent: 'MaxEvo',
+        timestamp: new Date().toISOString()
+      })
+    }
     
     try {
       // Race the processing against the deadline

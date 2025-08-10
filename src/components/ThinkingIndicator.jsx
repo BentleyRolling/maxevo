@@ -60,7 +60,7 @@ export default function ThinkingIndicator({
           draggable={false}
         />
         {/* Cross-fade stack: two layers, one showing, one hidden */}
-        <div className="relative h-6 overflow-hidden">
+        <div className="relative overflow-hidden leading-6">
           <span
             className={`thinking-text shimmer thinking-line text-lg ${slot === 0 ? "show" : ""}`}
             aria-hidden={slot !== 0}
