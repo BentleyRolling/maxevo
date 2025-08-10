@@ -29,7 +29,8 @@ const ChatInterface = () => {
     isTyping,
     startThinking,
     stopThinking,
-    thinkingVisible
+    thinkingVisible,
+    setTyping
   } = useMaxEvoStore()
   
   const messagesEndRef = useRef(null)

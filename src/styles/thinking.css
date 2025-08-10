@@ -1,32 +1,33 @@
-/* Text shimmer using text-fill gradient sweep */
-.thinking-text {
-  position: relative;
-  display: inline-block;
-  color: rgba(229,231,235,0.82); /* base zinc-200-ish */
+/* Safe, reliable thinking indicator styles */
+.thinking-text { 
+  position: relative; 
+  display: inline-block; 
+  color: #e5e7eb; 
 }
 
-/* Shimmer as TEXT FILL (no overlay bar), seamless wrap */
 .shimmer {
   color: transparent;
-  background-image: linear-gradient(
-    90deg,
-    rgba(229,231,235,0.78) 0%,
-    rgba(229,231,235,0.78) 40%,
-    rgba(255,255,255,0.96) 50%,  /* thin bright ridge */
-    rgba(229,231,235,0.78) 60%,
-    rgba(229,231,235,0.78) 100%
-  );
+  background-image: linear-gradient(90deg,
+    rgba(229,231,235,.78) 0%, rgba(229,231,235,.78) 40%,
+    rgba(255,255,255,.95) 50%, rgba(229,231,235,.78) 60%,
+    rgba(229,231,235,.78) 100%);
   background-size: 200% 100%;
   background-position: 0% 0;
-  -webkit-background-clip: text;
+  -webkit-background-clip: text; 
   background-clip: text;
   animation: thinking-shimmer 2.8s linear infinite;
-  will-change: background-position;
 }
 
-@keyframes thinking-shimmer {
-  /* left → right with seamless reset because ends look identical */
-  to { background-position: 200% 0; }
+@keyframes thinking-shimmer { 
+  to { background-position: 200% 0; } 
+}
+
+/* Fallback for reduced motion or CSS loading issues */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { 
+    animation: none; 
+    color: #e5e7eb; 
+  }
 }
 
 /* Cross-fade for phrase swap (prevents flicker on change) */

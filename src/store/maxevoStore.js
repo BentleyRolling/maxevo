@@ -253,6 +253,15 @@ export const useMaxEvoStore = create(
             wait
           )
         }
+      },
+
+      // Compatibility shim - makes old setTyping() calls use new min-visible logic
+      setTyping: (on) => {
+        if (on) {
+          get().startThinking(900)
+        } else {
+          get().stopThinking()
+        }
       }
     }),
     {
