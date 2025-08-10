@@ -153,6 +153,15 @@ app.get('/health', (req, res) => {
   })
 })
 
+// Build verification endpoint
+app.get('/__whoami', (req, res) => {
+  res.json({ 
+    ui_build: process.env.UI_BUILD || Date.now(),
+    timestamp: new Date().toISOString(),
+    version: 'hero-interface-v2'
+  })
+})
+
 // Debug endpoint to verify deployments
 app.get('/__whoami', (req, res) => {
   res.json({
