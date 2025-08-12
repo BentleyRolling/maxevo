@@ -1,0 +1,21 @@
+budgets:
+  max_total_tokens_per_turn: 8000
+  max_latency_ms: 6000
+
+genius:
+  max_sources: 7
+  per_source_summary_tokens: 120
+  timebound_days: 540
+
+qc:
+  quick_tokens: 600
+  deep_tokens: 2000
+  max_loops: 2
+
+plans:
+  free:    { genius_monthly: 5,   qc_monthly: 10 }
+  starter: { genius_monthly: 30,  qc_monthly: 60 }
+  pro:     { genius_monthly: 120, qc_monthly: 240 }
+
+router:
+  default_public_agent: "Max"
