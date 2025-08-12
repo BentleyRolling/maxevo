@@ -1,0 +1,61 @@
+name: maxevo-ai-platform
+services:
+- name: api
+  source_dir: /
+  github:
+    repo: BentleyRolling/maxevo-ai-platform
+    branch: master
+    deploy_on_push: true
+  build_command: npm install && npm run build
+  run_command: node dist/server.js
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3000
+  health_check:
+    http_path: /api/health
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "3000"
+  - key: DATABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: SERPER_API_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: MAXEVO_DATA_DIR
+    value: /data
+
+databases:
+- name: maxevo-db
+  engine: PG
+  version: "15"
+  size: basic
+
+workers:
+- name: scheduler
+  source_dir: /
+  github:
+    repo: BentleyRolling/maxevo-ai-platform
+    branch: master
+    deploy_on_push: true
+  build_command: npm install && npm run build
+  run_command: node -e "const { startScheduler } = require('./dist/src/scheduler/queue.js'); startScheduler();"
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: DATABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: SERPER_API_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: MAXEVO_DATA_DIR
+    value: /data
