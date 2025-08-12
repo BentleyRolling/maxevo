@@ -1,0 +1,19 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to DigitalOcean App Platform
+      uses: digitalocean/app_action@v1.1.5
+      with:
+        app_name: maxevo-ai-platform
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        app_spec_location: .do/app.yaml
