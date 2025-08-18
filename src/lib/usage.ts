@@ -1,4 +1,5 @@
-import { PrismaClient, Plan } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import type { Plan } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function getPlanLimits(plan: Plan, cfg: any) {

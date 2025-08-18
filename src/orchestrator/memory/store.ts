@@ -40,7 +40,7 @@ export async function recallByTags(
     take: limit
   });
   
-  return memories.map(m => ({
+  return memories.map((m: any) => ({
     key: m.key,
     value: JSON.parse(m.value),
     tags: m.tags,
