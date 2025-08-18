@@ -38,4 +38,7 @@ RUN mkdir -p maxevo-ui && cp -r /tmp/ui-dist maxevo-ui/dist && rm -rf /tmp/ui-di
 
 EXPOSE 3000
 
+# Set production environment
+ENV NODE_ENV=production
+
 CMD ["node", "dist/server.js"]

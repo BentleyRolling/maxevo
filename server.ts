@@ -20,7 +20,11 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Serve static files from maxevo-ui build directory
-app.use(express.static(path.join(__dirname, 'maxevo-ui/dist')));
+// In Docker, we're in /app/dist when running, so go up one level
+const staticPath = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, '../maxevo-ui/dist')
+  : path.join(__dirname, 'maxevo-ui/dist');
+app.use(express.static(staticPath));
 
 // API Routes
 app.use(chat);
@@ -52,7 +56,10 @@ app.get("/api", (req, res) => {
 
 // Serve MaxEvo UI for all other routes (SPA fallback)
 app.get("*", (req, res) => {
-  const indexPath = path.join(__dirname, 'maxevo-ui/dist/index.html');
+  const indexPath = process.env.NODE_ENV === 'production' 
+    ? path.join(__dirname, '../maxevo-ui/dist/index.html')
+    : path.join(__dirname, 'maxevo-ui/dist/index.html');
+  
   console.log(`Serving SPA for ${req.path}, index.html path: ${indexPath}`);
   
   res.sendFile(indexPath, (err) => {
@@ -61,6 +68,7 @@ app.get("*", (req, res) => {
       console.error(`Current working directory: ${process.cwd()}`);
       console.error(`__dirname: ${__dirname}`);
       console.error(`Looking for file at: ${indexPath}`);
+      console.error(`NODE_ENV: ${process.env.NODE_ENV}`);
       res.status(500).json({
         error: true,
         code: "UI_NOT_FOUND",
@@ -68,7 +76,8 @@ app.get("*", (req, res) => {
         debug: {
           path: indexPath,
           cwd: process.cwd(),
-          dirname: __dirname
+          dirname: __dirname,
+          nodeEnv: process.env.NODE_ENV
         }
       });
     }
