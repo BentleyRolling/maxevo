@@ -1,11 +1,16 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import { chat } from "./src/routes/chat.js";
 import { workspace } from "./src/routes/workspace.js";
 import { health } from "./src/routes/health.js";
 
 // Import scheduler to initialize cron jobs
 import "./src/scheduler/queue.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,13 +19,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Routes
+// Serve static files from maxevo-ui build directory
+app.use(express.static(path.join(__dirname, 'maxevo-ui/dist')));
+
+// API Routes
 app.use(chat);
 app.use(workspace);
 app.use(health);
 
-// Root endpoint
-app.get("/", (req, res) => {
+// API info endpoint
+app.get("/api", (req, res) => {
   res.json({
     name: "MaxEvo AI Agent Platform",
     version: "1.0.0",
@@ -40,6 +48,11 @@ app.get("/", (req, res) => {
       health: "/api/health"
     }
   });
+});
+
+// Serve MaxEvo UI for all other routes (SPA fallback)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'maxevo-ui/dist/index.html'));
 });
 
 // Error handling middleware

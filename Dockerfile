@@ -18,7 +18,13 @@ RUN npx prisma generate
 # Copy source code
 COPY . .
 
-# Build the TypeScript project
+# Build the UI
+WORKDIR /app/maxevo-ui
+RUN npm ci
+RUN npm run build
+
+# Build the TypeScript backend
+WORKDIR /app
 RUN npm run build
 
 # Remove dev dependencies to reduce image size
