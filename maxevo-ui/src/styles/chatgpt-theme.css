@@ -1,0 +1,17 @@
+/* src/styles/chatgpt-theme.css */
+@tailwind base;
+@layer base {
+  .theme-chatgpt { background: #0b0b0d; color: #e5e7eb; }
+  .theme-chatgpt .prose {
+    --tw-prose-body:       theme(colors.zinc.200);
+    --tw-prose-headings:   theme(colors.zinc.100);
+    --tw-prose-bold:       theme(colors.white);
+    --tw-prose-links:      theme(colors.blue.400);
+    --tw-prose-hr:         #232327;
+    --tw-prose-quotes:     theme(colors.zinc.200);
+    --tw-prose-quote-borders: #2a2a30;
+    --tw-prose-captions:   theme(colors.zinc.400);
+    --tw-prose-code:       theme(colors.zinc.100);
+    --tw-prose-pre-bg:     #0b0b0d;
+  }
+}

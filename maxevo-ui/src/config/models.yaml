@@ -1,0 +1,24 @@
+models:
+  openai:gpt-4o-mini:
+    role: bulk_low_risk
+    max_context: 128000
+    cost: { input_per_1k: 0.15, output_per_1k: 0.60 }
+  anthropic:claude-3.5-sonnet:
+    role: coder_executor
+    max_context: 200000
+    cost: { input_per_1k: 3.00, output_per_1k: 15.00 }
+  anthropic:claude-3.5-haiku:
+    role: cheap_qc
+    max_context: 200000
+    cost: { input_per_1k: 0.25, output_per_1k: 1.25 }
+  openai:gpt-4.1:
+    role: tool_calling_strict
+    max_context: 128000
+    cost: { input_per_1k: 5.00, output_per_1k: 15.00 }
+
+router_defaults:
+  fast_model: openai:gpt-4o-mini
+  coder_model: anthropic:claude-3.5-sonnet
+  qc_cheap_model: anthropic:claude-3.5-haiku
+  tool_calling_strict: openai:gpt-4.1
+  adjudicator_model: ${ADJUDICATOR_MODEL:-openai:gpt-4.1}

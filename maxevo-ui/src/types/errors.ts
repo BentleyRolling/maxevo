@@ -1,0 +1,8 @@
+export const ERR = { 
+  PROVIDER_FAILURE: "PROVIDER_FAILURE", 
+  LIMIT_EXCEEDED: "LIMIT_EXCEEDED",
+  UNAUTHORIZED: "UNAUTHORIZED", 
+  INVALID_REQUEST: "INVALID_REQUEST" 
+} as const;
+
+export type ErrorCode = typeof ERR[keyof typeof ERR];
