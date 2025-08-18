@@ -27,8 +27,14 @@ RUN npm run build
 WORKDIR /app
 RUN npm run build
 
-# Remove dev dependencies to reduce image size
+# Copy UI build files to ensure they're preserved after pruning
+RUN cp -r maxevo-ui/dist /tmp/ui-dist
+
+# Remove dev dependencies to reduce image size (only from main package)
 RUN npm prune --production
+
+# Restore UI build files
+RUN mkdir -p maxevo-ui && cp -r /tmp/ui-dist maxevo-ui/dist && rm -rf /tmp/ui-dist
 
 EXPOSE 3000
 

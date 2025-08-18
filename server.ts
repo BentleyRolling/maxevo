@@ -52,7 +52,27 @@ app.get("/api", (req, res) => {
 
 // Serve MaxEvo UI for all other routes (SPA fallback)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, 'maxevo-ui/dist/index.html'));
+  const indexPath = path.join(__dirname, 'maxevo-ui/dist/index.html');
+  console.log(`Serving SPA for ${req.path}, index.html path: ${indexPath}`);
+  
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error(`Error serving index.html: ${err.message}`);
+      console.error(`Current working directory: ${process.cwd()}`);
+      console.error(`__dirname: ${__dirname}`);
+      console.error(`Looking for file at: ${indexPath}`);
+      res.status(500).json({
+        error: true,
+        code: "UI_NOT_FOUND",
+        message: "MaxEvo UI not found. Build may have failed.",
+        debug: {
+          path: indexPath,
+          cwd: process.cwd(),
+          dirname: __dirname
+        }
+      });
+    }
+  });
 });
 
 // Error handling middleware
@@ -63,6 +83,12 @@ app.use((error: any, req: any, res: any, next: any) => {
     code: "INTERNAL_ERROR",
     message: "An unexpected error occurred"
   });
+});
+
+// 404 handler for missing static files
+app.use((req: any, res: any, next: any) => {
+  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+  next();
 });
 
 // Start server
